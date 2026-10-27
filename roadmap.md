@@ -1,4 +1,6 @@
 # HAOUSSA
+- [ ] Corriger les causes communes : syntaxe, pages manquantes, navigation et persistance
+- [ ] Vérifier le recensement de bout en bout et les accès de chaque espace
 - [ ] Parcours de recensement et confirmation
 - [ ] Espace membre et demandes de données
 - [ ] Administration, décisions, rôles et outils

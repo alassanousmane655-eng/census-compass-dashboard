@@ -1,37 +1,787 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, ArrowRight, Check, CheckCircle2, ShieldCheck, Save, Send, FileCheck2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { ToValidate } from '@/components/common/ToValidate';
-import { REGIONS } from '@/data/territories';
-import { getRegion, getDepartment, regionName, departmentName, arrondissementName } from '@/data/territory-utils';
-import { AGE_BANDS, SITUATIONS, SECTORS, INTERESTS, NOTICE_VERSION, labelOf } from '@/domain/reference';
-import type { ProfileData, ResidenceData, ActivityData, ParticipationData, NoticeRecord } from '@/domain/types';
-import { loadDraft, saveDraft, clearDraft, submitDossier, signIn, useSession, findMemberDossier, useApp, type CensusDraft } from '@/services/store';
-import { profileSchema, residenceSchema, activitySchema } from './validation';
-const STEPS=['Information & choix','Votre profil','Votre résidence','Votre activité','Votre participation','Récapitulatif'];
-export function Field({label,name,error,children,optional=false}:{label:string;name:string;error?:string;children:React.ReactNode;optional?:boolean}){return <div><label htmlFor={name} className="mb-2 block text-sm font-semibold">{label}{optional&&<span className="ml-2 font-normal text-muted-foreground">(facultatif)</span>}</label>{children}{error&&<p id={`${name}-error`} role="alert" className="mt-1 text-sm text-danger">{error}</p>}</div>}
-export function ProfileFields({value,onChange,errors={}}:{value:Partial<ProfileData>;onChange:(v:Partial<ProfileData>)=>void;errors?:Record<string,string>}){return <div className="grid gap-5 sm:grid-cols-2"><Field name="firstName" label="Prénom(s)" error={errors.firstName}><input id="firstName" className="field-input" autoComplete="given-name" value={value.firstName??''} onChange={e=>onChange({...value,firstName:e.target.value})} aria-invalid={!!errors.firstName} aria-describedby={errors.firstName?'firstName-error':undefined}/></Field><Field name="lastName" label="Nom" error={errors.lastName}><input id="lastName" className="field-input" autoComplete="family-name" value={value.lastName??''} onChange={e=>onChange({...value,lastName:e.target.value})} aria-invalid={!!errors.lastName}/></Field><Field name="ageBand" label="Tranche d’âge" error={errors.ageBand}><select id="ageBand" className="field-input" value={value.ageBand??''} onChange={e=>onChange({...value,ageBand:e.target.value as ProfileData['ageBand']})}><option value="">Sélectionner</option>{AGE_BANDS.map(a=><option key={a.value} value={a.value}>{a.label}</option>)}</select></Field><Field name="contactType" label="Moyen de contact"><select id="contactType" className="field-input" value={value.contactType??'email'} onChange={e=>onChange({...value,contactType:e.target.value as ProfileData['contactType'],contact:''})}><option value="email">E-mail</option><option value="telephone">Téléphone</option></select></Field><div className="sm:col-span-2"><Field name="contact" label={value.contactType==='telephone'?'Numéro de téléphone':'Adresse e-mail'} error={errors.contact}><input id="contact" className="field-input" type={value.contactType==='telephone'?'tel':'email'} autoComplete={value.contactType==='telephone'?'tel':'email'} value={value.contact??''} onChange={e=>onChange({...value,contact:e.target.value})} aria-invalid={!!errors.contact}/></Field></div></div>}
-export function ResidenceFields({value,onChange,errors={}}:{value:Partial<ResidenceData>;onChange:(v:Partial<ResidenceData>)=>void;errors?:Record<string,string>}){return <div className="space-y-5"><Field name="regionCode" label="Région" error={errors.regionCode}><select id="regionCode" className="field-input" value={value.regionCode??''} onChange={e=>onChange({regionCode:e.target.value,departmentCode:'',arrondissementCode:''})}><option value="">Choisir une région</option>{REGIONS.map(r=><option key={r.code} value={r.code}>{r.name}</option>)}</select></Field><Field name="departmentCode" label="Département" error={errors.departmentCode}><select id="departmentCode" className="field-input disabled:opacity-50" disabled={!value.regionCode} value={value.departmentCode??''} onChange={e=>onChange({...value,departmentCode:e.target.value,arrondissementCode:''})}><option value="">Choisir un département</option>{getRegion(value.regionCode??'')?.departments.map(d=><option key={d.code} value={d.code}>{d.name}</option>)}</select></Field><Field name="arrondissementCode" label="Arrondissement" error={errors.arrondissementCode}><select id="arrondissementCode" className="field-input disabled:opacity-50" disabled={!value.departmentCode} value={value.arrondissementCode??''} onChange={e=>onChange({...value,arrondissementCode:e.target.value})}><option value="">Choisir un arrondissement</option>{getDepartment(value.departmentCode??'')?.arrondissements.map(a=><option key={a.code} value={a.code}>{a.name}</option>)}</select></Field><Field name="localite" label="Localité ou quartier" optional><input id="localite" className="field-input" maxLength={120} value={value.localite??''} onChange={e=>onChange({...value,localite:e.target.value})}/></Field></div>}
-export function ActivityFields({value,onChange,errors={}}:{value:Partial<ActivityData>;onChange:(v:Partial<ActivityData>)=>void;errors?:Record<string,string>}){return <div className="space-y-5"><Field name="situation" label="Situation professionnelle" error={errors.situation}><select id="situation" className="field-input" value={value.situation??''} onChange={e=>onChange({...value,situation:e.target.value as ActivityData['situation']})}><option value="">Sélectionner</option>{SITUATIONS.map(s=><option key={s.value} value={s.value}>{s.label}</option>)}</select></Field><Field name="sectorCode" label="Secteur d’activité" error={errors.sectorCode}><select id="sectorCode" className="field-input" value={value.sectorCode??''} onChange={e=>onChange({...value,sectorCode:e.target.value})}><option value="">Sélectionner</option>{SECTORS.map(s=><option key={s.code} value={s.code}>{s.label}</option>)}</select></Field><Field name="profession" label="Profession" optional error={errors.profession}><input id="profession" className="field-input" maxLength={120} value={value.profession??''} onChange={e=>onChange({...value,profession:e.target.value})}/></Field></div>}
-export function DossierSummary({profile,residence,activity,participation}:{profile:Partial<ProfileData>;residence:Partial<ResidenceData>;activity:Partial<ActivityData>;participation?:ParticipationData}){return <dl className="space-y-5"><div className="border-b pb-4"><dt className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Profil</dt><dd className="font-semibold">{profile.firstName} {profile.lastName}</dd><dd>{labelOf(AGE_BANDS,profile.ageBand??'')} · {profile.contact}</dd></div><div className="border-b pb-4"><dt className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Résidence</dt><dd>{regionName(residence.regionCode??'')} → {departmentName(residence.departmentCode??'')} → {arrondissementName(residence.arrondissementCode??'')}</dd>{residence.localite&&<dd>{residence.localite}</dd>}</div><div className="border-b pb-4"><dt className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Activité</dt><dd>{labelOf(SITUATIONS,activity.situation??'')} · {labelOf(SECTORS,activity.sectorCode??'')}</dd>{activity.profession&&<dd>{activity.profession}</dd>}</div>{participation&&<div><dt className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Participation</dt><dd>{participation.interested?participation.interests.map(i=>labelOf(INTERESTS,i)).join(', ')||'Intéressé(e)':'Pas de participation souhaitée pour le moment'}</dd></div>}</dl>}
-export function CensusForm({assisted=false}:{assisted?:boolean}){
- const session=useSession(),app=useApp(),navigate=useNavigate();const uid=session?.account.userId??'visitor-demo';
- const [draft,setDraft]=useState<CensusDraft>({step:0,profile:{contactType:'email'},participation:{interested:false,interests:[]}});const [ready,setReady]=useState(false);const [ack,setAck]=useState(false),[contactConsent,setContactConsent]=useState(false),[confirmed,setConfirmed]=useState(false),[errors,setErrors]=useState<Record<string,string>>({}),[busy,setBusy]=useState(false);const heading=useRef<HTMLHeadingElement>(null);
- useEffect(()=>{const d=loadDraft(uid);if(d){setDraft(d);setAck(!!d.notice);setContactConsent(d.notice?.acceptsCentreContact??false)}setReady(true)},[uid]);
- useEffect(()=>{if(ready)saveDraft(uid,draft)},[draft,ready,uid]);
- const update=(v:Partial<CensusDraft>)=>setDraft(d=>({...d,...v}));
- const step=draft.step; const existing=findMemberDossier(app,session?.account.userId);
- function move(next:number){setErrors({});update({step:next});setTimeout(()=>heading.current?.focus(),0)}
- function valid(){let errs:Record<string,string>={};if(step===0&&!ack)errs.notice='Veuillez confirmer avoir lu la notice.'; const schema=step===1?profileSchema:step===2?residenceSchema:step===3?activitySchema:null;const input=step===1?draft.profile:step===2?draft.residence:draft.activity;if(schema){const result=schema.safeParse(input??{});if(!result.success)for(const issue of result.error.issues)errs[String(issue.path[0])]=issue.message}if(step===5&&!confirmed)errs.confirm='Confirmez l’exactitude des informations.';setErrors(errs);return !Object.keys(errs).length}
- async function next(){if(!valid())return;if(step===0)update({notice:{version:NOTICE_VERSION,acknowledgedAt:new Date().toISOString(),acceptsCentreContact:contactConsent}});if(step<5){move(step+1);return}const p=profileSchema.safeParse(draft.profile),r=residenceSchema.safeParse(draft.residence),a=activitySchema.safeParse(draft.activity);if(!p.success||!r.success||!a.success||!draft.notice){toast.error('Vérifiez les étapes précédentes.');return}setBusy(true);try{let userId=uid;if(!session&&!assisted){const account=signIn({email:p.data.contactType==='email'?p.data.contact:'visiteur@haoussa.demo',displayName:p.data.firstName,provider:'email'});userId=account.userId}if(assisted)userId=`assisted-${crypto.randomUUID()}`;const dossier=submitDossier(userId,{notice:draft.notice,profile:p.data as ProfileData,residence:r.data,activity:a.data as ActivityData,participation:draft.participation??{interested:false,interests:[]}});clearDraft(uid);navigate({to:'/recensement/confirmation',search:{ref:dossier.reference}})}catch(e){toast.error(e instanceof Error?e.message:'La soumission a échoué.')}finally{setBusy(false)}}
- if(existing&&!assisted)return <div className="container-page py-16"><h1 className="section-title">Vous avez déjà un dossier</h1><p className="my-5">Référence : {existing.reference}. Vous pouvez suivre son état dans votre espace.</p><Button asChild><Link to="/membre/dossier">Voir mon dossier <ArrowRight/></Link></Button></div>;
- return <div className={assisted?'':'container-page py-10 md:py-14'}><div className="mb-8 flex flex-wrap justify-between gap-4"><div><p className="eyebrow mb-3">{assisted?'Recensement accompagné':'Recensement communautaire'}</p><h1 className="text-3xl md:text-4xl">Se faire recenser</h1><p className="mt-3 text-muted-foreground">Chaque parcours compte. Le vôtre aussi.</p></div><span className="flex items-center gap-2 self-start text-xs text-muted-foreground"><Save className="size-4"/>Brouillon enregistré sur cet appareil</span></div><div className="grid gap-10 lg:grid-cols-[260px_1fr_230px]"><aside><ol className="grid grid-cols-3 gap-3 lg:grid-cols-1 lg:gap-5" aria-label="Étapes du recensement">{STEPS.map((label,i)=><li key={label} className="flex items-center gap-3" aria-current={i===step?'step':undefined}><span className={`flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${i===step?'bg-primary text-primary-foreground':i<step?'bg-primary-soft text-primary':'border text-muted-foreground'}`}>{i<step?<Check className="size-4"/>i+1}</span><span className={`hidden text-sm lg:block ${i===step?'font-semibold text-primary':'text-muted-foreground'}`}>{label}</span></li>)}</ol></aside><section className="min-w-0"><div className="mb-7 h-1 bg-muted"><div className={`h-full bg-copper ${['w-1/6','w-2/6','w-3/6','w-4/6','w-5/6','w-full'][step]}`}/></div><p className="mb-2 text-xs text-copper">ÉTAPE {step+1} SUR 6</p><h2 ref={heading} tabIndex={-1} className="mb-7 text-2xl outline-none">{STEPS[step]}</h2><form onSubmit={e=>{e.preventDefault();next()}} noValidate>
- {step===0&&<div className="space-y-6"><p>Avant de commencer, prenez connaissance de l’utilisation de vos informations.</p><div className="border-l-2 border-copper pl-5 text-sm leading-relaxed"><h3 className="mb-3 text-lg">Votre choix, vos données, vos droits.</h3><p>Le recensement vise à mieux connaître les dossiers déclarés de la communauté haoussa au Cameroun et à orienter les actions du Centre. La participation est volontaire.</p><p className="mt-3">Seuls un profil minimal, votre résidence et votre situation d’activité sont demandés. Les souhaits de participation et de contact sont facultatifs. Les résultats publics sont agrégés, sans noms ni coordonnées.</p><p className="mt-3">Vous pouvez demander l’accès, la rectification, la suppression ou vous opposer à l’utilisation de vos données. Cette démonstration conserve les informations uniquement dans votre navigateur.</p></div><ToValidate>Cette notice est provisoire. La durée de conservation, le responsable du traitement, les critères d’éligibilité et les coordonnées d’exercice des droits doivent être confirmés avant toute collecte réelle.</ToValidate><label className="flex items-start gap-3 text-sm"><input type="checkbox" className="mt-1 size-4 accent-primary" checked={ack} onChange={e=>setAck(e.target.checked)}/>J’ai lu la notice d’information et je souhaite poursuivre volontairement.</label>{errors.notice&&<p role="alert" className="text-sm text-danger">{errors.notice}</p>}<label className="flex items-start gap-3 text-sm"><input type="checkbox" className="mt-1 size-4 accent-primary" checked={contactConsent} onChange={e=>setContactConsent(e.target.checked)}/>J’accepte d’être contacté(e) par le Centre pour ses activités (facultatif).</label><Link to="/recensement/protection" className="text-sm text-primary underline">Consulter la protection des données</Link></div>}
- {step===1&&<ProfileFields value={draft.profile??{}} onChange={profile=>update({profile})} errors={errors}/>}{step===2&&<ResidenceFields value={draft.residence??{}} onChange={residence=>update({residence})} errors={errors}/>}{step===3&&<ActivityFields value={draft.activity??{}} onChange={activity=>update({activity})} errors={errors}/>}
- {step===4&&<div className="space-y-5"><p className="text-muted-foreground">Cette étape est facultative et n’influence pas la vérification de votre dossier.</p><label className="flex items-start gap-3"><input type="checkbox" className="mt-1 size-4 accent-primary" checked={draft.participation?.interested??false} onChange={e=>update({participation:{interested:e.target.checked,interests:[]}})}/>Je souhaite participer à la vie du Centre.</label>{draft.participation?.interested&&<fieldset className="space-y-4"><legend className="mb-4 text-sm font-semibold">Mes centres d’intérêt</legend>{INTERESTS.map(i=><label key={i.value} className="flex gap-3 text-sm"><input type="checkbox" className="size-4 accent-primary" checked={draft.participation?.interests.includes(i.value)} onChange={e=>{const p=draft.participation??{interested:true,interests:[]};update({participation:{...p,interests:e.target.checked?[...p.interests,i.value]:p.interests.filter(v=>v!==i.value)}})}}/>{i.label}</label>)}</fieldset>}</div>}
- {step===5&&<div className="space-y-7"><DossierSummary profile={draft.profile??{}} residence={draft.residence??{}} activity={draft.activity??{}} participation={draft.participation}/><div className="flex flex-wrap gap-2">{[1,2,3,4].map(i=><Button key={i} variant="outline" size="sm" type="button" onClick={()=>move(i)}>Modifier : {STEPS[i]}</Button>)}</div><label className="flex items-start gap-3 text-sm"><input type="checkbox" className="mt-1 size-4 accent-primary" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>Je confirme l’exactitude des informations de ce dossier de démonstration.</label>{errors.confirm&&<p role="alert" className="text-sm text-danger">{errors.confirm}</p>}</div>}
- <div className="mt-9 flex flex-wrap items-center justify-between gap-3 border-t pt-6"><Button variant="ghost" type="button" disabled={step===0} onClick={()=>move(step-1)}><ArrowLeft/>Retour</Button><Button type="submit" disabled={busy||!ready}>{step===5?<><Send/>{busy?'Envoi…':'Soumettre mon dossier'}</>:<>Continuer <ArrowRight/></>}</Button></div></form></section><aside className="hidden lg:block"><ShieldCheck className="mb-4 size-8 text-primary"/><h3 className="text-base">Une démarche de confiance</h3><p className="mt-3 text-sm text-muted-foreground">Vos coordonnées ne sont jamais affichées dans l’Observatoire.</p><div className="mt-7 border-t pt-5"><p className="text-sm font-semibold">Besoin d’un accompagnement ?</p><Link to="/contact" className="mt-2 inline-flex items-center gap-2 text-sm text-copper">Contacter le Centre <ArrowRight className="size-4"/></Link></div></aside></div></div>
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  ShieldCheck,
+  Save,
+  Send,
+  FileCheck2,
+} from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { ToValidate } from "@/components/common/ToValidate";
+import { REGIONS } from "@/data/territories";
+import {
+  getRegion,
+  getDepartment,
+  regionName,
+  departmentName,
+  arrondissementName,
+} from "@/data/territory-utils";
+import {
+  AGE_BANDS,
+  SITUATIONS,
+  SECTORS,
+  INTERESTS,
+  NOTICE_VERSION,
+  labelOf,
+} from "@/domain/reference";
+import type {
+  ProfileData,
+  ResidenceData,
+  ActivityData,
+  ParticipationData,
+  NoticeRecord,
+} from "@/domain/types";
+import {
+  loadDraft,
+  saveDraft,
+  clearDraft,
+  submitDossier,
+  signIn,
+  useSession,
+  findMemberDossier,
+  useApp,
+  type CensusDraft,
+} from "@/services/store";
+import { profileSchema, residenceSchema, activitySchema } from "./validation";
+const STEPS = [
+  "Information & choix",
+  "Votre profil",
+  "Votre résidence",
+  "Votre activité",
+  "Votre participation",
+  "Récapitulatif",
+];
+export function Field({
+  label,
+  name,
+  error,
+  children,
+  optional = false,
+}: {
+  label: string;
+  name: string;
+  error?: string;
+  children: React.ReactNode;
+  optional?: boolean;
+}) {
+  return (
+    <div>
+      <label htmlFor={name} className="mb-2 block text-sm font-semibold">
+        {label}
+        {optional && <span className="ml-2 font-normal text-muted-foreground">(facultatif)</span>}
+      </label>
+      {children}
+      {error && (
+        <p id={`${name}-error`} role="alert" className="mt-1 text-sm text-danger">
+          {error}
+        </p>
+      )}
+    </div>
+  );
 }
-export function Confirmation({reference}:{reference:string}){const app=useApp(),session=useSession();const dossier=app.dossiers.find(d=>d.reference===reference&&d.ownerUserId===session?.account.userId);return <div className="container-page py-16"><div className="mx-auto max-w-2xl text-center"><CheckCircle2 className="mx-auto mb-6 size-14 text-primary"/><p className="eyebrow mb-4">Dossier de démonstration reçu</p><h1 className="text-3xl md:text-4xl">Merci pour votre participation.</h1><p className="mt-5 text-muted-foreground">{dossier?'Votre dossier est soumis. Vous pourrez suivre sa vérification dans votre espace membre.':'Consultez votre espace membre pour retrouver votre dossier et sa référence.'}</p>{dossier&&<div className="my-8 border-y py-6"><p className="text-xs text-muted-foreground">VOTRE RÉFÉRENCE</p><p className="mt-2 text-2xl font-bold text-primary">{dossier.reference}</p></div>}<div className="mt-8 flex flex-wrap justify-center gap-3"><Button asChild><Link to="/membre/dossier"><FileCheck2/>Suivre mon dossier</Link></Button><Button variant="outline" asChild><Link to="/">Retour à l’accueil</Link></Button></div><p className="mt-8 text-xs text-muted-foreground">Aucune donnée n’a été envoyée au Centre. Conservez cet appareil pour retrouver votre démo.</p></div></div>}
+export function ProfileFields({
+  value,
+  onChange,
+  errors = {},
+}: {
+  value: Partial<ProfileData>;
+  onChange: (v: Partial<ProfileData>) => void;
+  errors?: Record<string, string>;
+}) {
+  return (
+    <div className="grid gap-5 sm:grid-cols-2">
+      <Field name="firstName" label="Prénom(s)" error={errors["firstName"]}>
+        <input
+          id="firstName"
+          className="field-input"
+          autoComplete="given-name"
+          value={value.firstName ?? ""}
+          onChange={(e) => onChange({ ...value, firstName: e.target.value })}
+          aria-invalid={!!errors["firstName"]}
+          aria-describedby={errors["firstName"] ? "firstName-error" : undefined}
+        />
+      </Field>
+      <Field name="lastName" label="Nom" error={errors["lastName"]}>
+        <input
+          id="lastName"
+          className="field-input"
+          autoComplete="family-name"
+          value={value.lastName ?? ""}
+          onChange={(e) => onChange({ ...value, lastName: e.target.value })}
+          aria-invalid={!!errors["lastName"]}
+        />
+      </Field>
+      <Field name="ageBand" label="Tranche d’âge" error={errors["ageBand"]}>
+        <select
+          id="ageBand"
+          className="field-input"
+          value={value.ageBand ?? ""}
+          onChange={(e) =>
+            onChange({ ...value, ageBand: e.target.value as ProfileData["ageBand"] })
+          }
+        >
+          <option value="">Sélectionner</option>
+          {AGE_BANDS.map((a) => (
+            <option key={a.value} value={a.value}>
+              {a.label}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <Field name="contactType" label="Moyen de contact">
+        <select
+          id="contactType"
+          className="field-input"
+          value={value.contactType ?? "email"}
+          onChange={(e) =>
+            onChange({
+              ...value,
+              contactType: e.target.value as ProfileData["contactType"],
+              contact: "",
+            })
+          }
+        >
+          <option value="email">E-mail</option>
+          <option value="telephone">Téléphone</option>
+        </select>
+      </Field>
+      <div className="sm:col-span-2">
+        <Field
+          name="contact"
+          label={value.contactType === "telephone" ? "Numéro de téléphone" : "Adresse e-mail"}
+          error={errors["contact"]}
+        >
+          <input
+            id="contact"
+            className="field-input"
+            type={value.contactType === "telephone" ? "tel" : "email"}
+            autoComplete={value.contactType === "telephone" ? "tel" : "email"}
+            value={value.contact ?? ""}
+            onChange={(e) => onChange({ ...value, contact: e.target.value })}
+            aria-invalid={!!errors["contact"]}
+          />
+        </Field>
+      </div>
+    </div>
+  );
+}
+export function ResidenceFields({
+  value,
+  onChange,
+  errors = {},
+}: {
+  value: Partial<ResidenceData>;
+  onChange: (v: Partial<ResidenceData>) => void;
+  errors?: Record<string, string>;
+}) {
+  return (
+    <div className="space-y-5">
+      <Field name="regionCode" label="Région" error={errors["regionCode"]}>
+        <select
+          id="regionCode"
+          className="field-input"
+          value={value.regionCode ?? ""}
+          onChange={(e) =>
+            onChange({ regionCode: e.target.value, departmentCode: "", arrondissementCode: "" })
+          }
+        >
+          <option value="">Choisir une région</option>
+          {REGIONS.map((r) => (
+            <option key={r.code} value={r.code}>
+              {r.name}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <Field name="departmentCode" label="Département" error={errors["departmentCode"]}>
+        <select
+          id="departmentCode"
+          className="field-input disabled:opacity-50"
+          disabled={!value.regionCode}
+          value={value.departmentCode ?? ""}
+          onChange={(e) =>
+            onChange({ ...value, departmentCode: e.target.value, arrondissementCode: "" })
+          }
+        >
+          <option value="">Choisir un département</option>
+          {getRegion(value.regionCode ?? "")?.departments.map((d) => (
+            <option key={d.code} value={d.code}>
+              {d.name}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <Field name="arrondissementCode" label="Arrondissement" error={errors["arrondissementCode"]}>
+        <select
+          id="arrondissementCode"
+          className="field-input disabled:opacity-50"
+          disabled={!value.departmentCode}
+          value={value.arrondissementCode ?? ""}
+          onChange={(e) => onChange({ ...value, arrondissementCode: e.target.value })}
+        >
+          <option value="">Choisir un arrondissement</option>
+          {getDepartment(value.departmentCode ?? "")?.arrondissements.map((a) => (
+            <option key={a.code} value={a.code}>
+              {a.name}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <Field name="localite" label="Localité ou quartier" optional>
+        <input
+          id="localite"
+          className="field-input"
+          maxLength={120}
+          value={value.localite ?? ""}
+          onChange={(e) => onChange({ ...value, localite: e.target.value })}
+        />
+      </Field>
+    </div>
+  );
+}
+export function ActivityFields({
+  value,
+  onChange,
+  errors = {},
+}: {
+  value: Partial<ActivityData>;
+  onChange: (v: Partial<ActivityData>) => void;
+  errors?: Record<string, string>;
+}) {
+  return (
+    <div className="space-y-5">
+      <Field name="situation" label="Situation professionnelle" error={errors["situation"]}>
+        <select
+          id="situation"
+          className="field-input"
+          value={value.situation ?? ""}
+          onChange={(e) =>
+            onChange({ ...value, situation: e.target.value as ActivityData["situation"] })
+          }
+        >
+          <option value="">Sélectionner</option>
+          {SITUATIONS.map((s) => (
+            <option key={s.value} value={s.value}>
+              {s.label}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <Field name="sectorCode" label="Secteur d’activité" error={errors["sectorCode"]}>
+        <select
+          id="sectorCode"
+          className="field-input"
+          value={value.sectorCode ?? ""}
+          onChange={(e) => onChange({ ...value, sectorCode: e.target.value })}
+        >
+          <option value="">Sélectionner</option>
+          {SECTORS.map((s) => (
+            <option key={s.code} value={s.code}>
+              {s.label}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <Field name="profession" label="Profession" optional error={errors["profession"]}>
+        <input
+          id="profession"
+          className="field-input"
+          maxLength={120}
+          value={value.profession ?? ""}
+          onChange={(e) => onChange({ ...value, profession: e.target.value })}
+        />
+      </Field>
+    </div>
+  );
+}
+export function DossierSummary({
+  profile,
+  residence,
+  activity,
+  participation,
+}: {
+  profile: Partial<ProfileData>;
+  residence: Partial<ResidenceData>;
+  activity: Partial<ActivityData>;
+  participation?: ParticipationData;
+}) {
+  return (
+    <dl className="space-y-5">
+      <div className="border-b pb-4">
+        <dt className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Profil</dt>
+        <dd className="font-semibold">
+          {profile.firstName} {profile.lastName}
+        </dd>
+        <dd>
+          {labelOf(AGE_BANDS, profile.ageBand ?? "")} · {profile.contact}
+        </dd>
+      </div>
+      <div className="border-b pb-4">
+        <dt className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Résidence</dt>
+        <dd>
+          {regionName(residence.regionCode ?? "")} →{" "}
+          {departmentName(residence.departmentCode ?? "")} →{" "}
+          {arrondissementName(residence.arrondissementCode ?? "")}
+        </dd>
+        {residence.localite && <dd>{residence.localite}</dd>}
+      </div>
+      <div className="border-b pb-4">
+        <dt className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Activité</dt>
+        <dd>
+          {labelOf(SITUATIONS, activity.situation ?? "")} ·{" "}
+          {labelOf(SECTORS, activity.sectorCode ?? "")}
+        </dd>
+        {activity.profession && <dd>{activity.profession}</dd>}
+      </div>
+      {participation && (
+        <div>
+          <dt className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
+            Participation
+          </dt>
+          <dd>
+            {participation.interested
+              ? participation.interests.map((i) => labelOf(INTERESTS, i)).join(", ") ||
+                "Intéressé(e)"
+              : "Pas de participation souhaitée pour le moment"}
+          </dd>
+        </div>
+      )}
+    </dl>
+  );
+}
+export function CensusForm({ assisted = false }: { assisted?: boolean }) {
+  const session = useSession(),
+    app = useApp(),
+    navigate = useNavigate();
+  const uid = assisted ? "assisted-demo" : (session?.account.userId ?? "visitor-demo");
+  const [draft, setDraft] = useState<CensusDraft>({
+    step: 0,
+    profile: { contactType: "email" },
+    participation: { interested: false, interests: [] },
+  });
+  const [loadedUid, setLoadedUid] = useState<string | null>(null);
+  const ready = loadedUid === uid;
+  const submitted = useRef(false);
+  const [ack, setAck] = useState(false),
+    [contactConsent, setContactConsent] = useState(false),
+    [confirmed, setConfirmed] = useState(false),
+    [errors, setErrors] = useState<Record<string, string>>({}),
+    [busy, setBusy] = useState(false);
+  const heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    const d = loadDraft(uid) ?? {
+      step: 0,
+      profile: { contactType: "email" as const },
+      participation: { interested: false, interests: [] },
+    };
+    const currentNotice = d.notice?.version === NOTICE_VERSION;
+    setDraft(currentNotice ? d : { ...d, step: 0, notice: undefined });
+    setAck(currentNotice);
+    setContactConsent(currentNotice ? (d.notice?.acceptsCentreContact ?? false) : false);
+    setConfirmed(false);
+    setLoadedUid(uid);
+  }, [uid]);
+  useEffect(() => {
+    if (ready && !submitted.current) saveDraft(uid, draft);
+  }, [draft, ready, uid]);
+  const update = (v: Partial<CensusDraft>) => setDraft((d) => ({ ...d, ...v }));
+  const step = draft.step;
+  const existing = findMemberDossier(app, session?.account.userId);
+  function move(next: number) {
+    setErrors({});
+    update({ step: next });
+    setTimeout(() => heading.current?.focus(), 0);
+  }
+  function valid() {
+    let errs: Record<string, string> = {};
+    if (step === 0 && !ack) errs["notice"] = "Veuillez confirmer avoir lu la notice.";
+    const schema =
+      step === 1
+        ? profileSchema
+        : step === 2
+          ? residenceSchema
+          : step === 3
+            ? activitySchema
+            : null;
+    const input = step === 1 ? draft.profile : step === 2 ? draft.residence : draft.activity;
+    if (schema) {
+      const result = schema.safeParse(input ?? {});
+      if (!result.success)
+        for (const issue of result.error.issues) errs[String(issue.path[0])] = issue.message;
+    }
+    if (step === 5 && !confirmed) errs["confirm"] = "Confirmez l’exactitude des informations.";
+    setErrors(errs);
+    return !Object.keys(errs).length;
+  }
+  async function next() {
+    if (!valid()) return;
+    if (step === 0)
+      update({
+        notice: {
+          version: NOTICE_VERSION,
+          acknowledgedAt: new Date().toISOString(),
+          acceptsCentreContact: contactConsent,
+        },
+      });
+    if (step < 5) {
+      move(step + 1);
+      return;
+    }
+    const p = profileSchema.safeParse(draft.profile),
+      r = residenceSchema.safeParse(draft.residence),
+      a = activitySchema.safeParse(draft.activity);
+    if (
+      !p.success ||
+      !r.success ||
+      !a.success ||
+      !draft.notice ||
+      draft.notice.version !== NOTICE_VERSION
+    ) {
+      toast.error("Vérifiez les étapes précédentes.");
+      return;
+    }
+    setBusy(true);
+    try {
+      let userId = uid;
+      if (!session && !assisted) {
+        const account = signIn({
+          email: p.data.contactType === "email" ? p.data.contact : "visiteur@haoussa.demo",
+          displayName: p.data.firstName,
+          provider: "email",
+        });
+        userId = account.userId;
+      }
+      if (assisted) userId = `assisted-${crypto.randomUUID()}`;
+      const dossier = submitDossier(userId, {
+        notice: draft.notice,
+        profile: p.data as ProfileData,
+        residence: r.data,
+        activity: a.data as ActivityData,
+        participation: draft.participation ?? { interested: false, interests: [] },
+      });
+      submitted.current = true;
+      clearDraft(uid);
+      if (assisted) navigate({ to: "/admin/dossiers/$id", params: { id: dossier.id } });
+      else navigate({ to: "/recensement/confirmation", search: { ref: dossier.reference } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "La soumission a échoué.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  if (existing && !assisted)
+    return (
+      <div className="container-page py-16">
+        <h1 className="section-title">Vous avez déjà un dossier</h1>
+        <p className="my-5">
+          Référence : {existing.reference}. Vous pouvez suivre son état dans votre espace.
+        </p>
+        <Button asChild>
+          <Link to="/membre/dossier">
+            Voir mon dossier <ArrowRight />
+          </Link>
+        </Button>
+      </div>
+    );
+  return (
+    <div className={assisted ? "" : "container-page py-10 md:py-14"}>
+      <div className="mb-8 flex flex-wrap justify-between gap-4">
+        <div>
+          <p className="eyebrow mb-3">
+            {assisted ? "Recensement accompagné" : "Recensement communautaire"}
+          </p>
+          <h1 className="text-3xl md:text-4xl">Se faire recenser</h1>
+          <p className="mt-3 text-muted-foreground">Chaque parcours compte. Le vôtre aussi.</p>
+        </div>
+        <span className="flex items-center gap-2 self-start text-xs text-muted-foreground">
+          <Save className="size-4" />
+          Brouillon enregistré sur cet appareil
+        </span>
+      </div>
+      <div className="grid gap-10 lg:grid-cols-[260px_1fr_230px]">
+        <aside>
+          <ol
+            className="grid grid-cols-3 gap-3 lg:grid-cols-1 lg:gap-5"
+            aria-label="Étapes du recensement"
+          >
+            {STEPS.map((label, i) => (
+              <li
+                key={label}
+                className="flex items-center gap-3"
+                aria-current={i === step ? "step" : undefined}
+              >
+                <span
+                  className={`flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${i === step ? "bg-primary text-primary-foreground" : i < step ? "bg-primary-soft text-primary" : "border text-muted-foreground"}`}
+                >
+                  {i < step ? <Check className="size-4" /> : i + 1}
+                </span>
+                <span
+                  className={`hidden text-sm lg:block ${i === step ? "font-semibold text-primary" : "text-muted-foreground"}`}
+                >
+                  {label}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </aside>
+        <section className="min-w-0">
+          <div className="mb-7 h-1 bg-muted">
+            <div
+              className={`h-full bg-copper ${["w-1/6", "w-2/6", "w-3/6", "w-4/6", "w-5/6", "w-full"][step]}`}
+            />
+          </div>
+          <p className="mb-2 text-xs text-copper">ÉTAPE {step + 1} SUR 6</p>
+          <h2 ref={heading} tabIndex={-1} className="mb-7 text-2xl outline-none">
+            {STEPS[step]}
+          </h2>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              next();
+            }}
+            noValidate
+          >
+            {step === 0 && (
+              <div className="space-y-6">
+                <p>Avant de commencer, prenez connaissance de l’utilisation de vos informations.</p>
+                <div className="border-l-2 border-copper pl-5 text-sm leading-relaxed">
+                  <h3 className="mb-3 text-lg">Votre choix, vos données, vos droits.</h3>
+                  <p>
+                    Le recensement vise à mieux connaître les dossiers déclarés de la communauté
+                    haoussa au Cameroun et à orienter les actions du Centre. La participation est
+                    volontaire.
+                  </p>
+                  <p className="mt-3">
+                    Seuls un profil minimal, votre résidence et votre situation d’activité sont
+                    demandés. Les souhaits de participation et de contact sont facultatifs. Les
+                    résultats publics sont agrégés, sans noms ni coordonnées.
+                  </p>
+                  <p className="mt-3">
+                    Vous pouvez demander l’accès, la rectification, la suppression ou vous opposer à
+                    l’utilisation de vos données. Cette démonstration conserve les informations
+                    uniquement dans votre navigateur.
+                  </p>
+                </div>
+                <ToValidate>
+                  Cette notice est provisoire. La durée de conservation, le responsable du
+                  traitement, les critères d’éligibilité et les coordonnées d’exercice des droits
+                  doivent être confirmés avant toute collecte réelle.
+                </ToValidate>
+                <label className="flex items-start gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    className="mt-1 size-4 accent-primary"
+                    checked={ack}
+                    onChange={(e) => setAck(e.target.checked)}
+                  />
+                  J’ai lu la notice d’information et je souhaite poursuivre volontairement.
+                </label>
+                {errors["notice"] && (
+                  <p role="alert" className="text-sm text-danger">
+                    {errors["notice"]}
+                  </p>
+                )}
+                <label className="flex items-start gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    className="mt-1 size-4 accent-primary"
+                    checked={contactConsent}
+                    onChange={(e) => setContactConsent(e.target.checked)}
+                  />
+                  J’accepte d’être contacté(e) par le Centre pour ses activités (facultatif).
+                </label>
+                <Link to="/recensement/protection" className="text-sm text-primary underline">
+                  Consulter la protection des données
+                </Link>
+              </div>
+            )}
+            {step === 1 && (
+              <ProfileFields
+                value={draft.profile ?? {}}
+                onChange={(profile) => update({ profile })}
+                errors={errors}
+              />
+            )}
+            {step === 2 && (
+              <ResidenceFields
+                value={draft.residence ?? {}}
+                onChange={(residence) => update({ residence })}
+                errors={errors}
+              />
+            )}
+            {step === 3 && (
+              <ActivityFields
+                value={draft.activity ?? {}}
+                onChange={(activity) => update({ activity })}
+                errors={errors}
+              />
+            )}
+            {step === 4 && (
+              <div className="space-y-5">
+                <p className="text-muted-foreground">
+                  Cette étape est facultative et n’influence pas la vérification de votre dossier.
+                </p>
+                <label className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    className="mt-1 size-4 accent-primary"
+                    checked={draft.participation?.interested ?? false}
+                    onChange={(e) =>
+                      update({ participation: { interested: e.target.checked, interests: [] } })
+                    }
+                  />
+                  Je souhaite participer à la vie du Centre.
+                </label>
+                {draft.participation?.interested && (
+                  <fieldset className="space-y-4">
+                    <legend className="mb-4 text-sm font-semibold">Mes centres d’intérêt</legend>
+                    {INTERESTS.map((i) => (
+                      <label key={i.value} className="flex gap-3 text-sm">
+                        <input
+                          type="checkbox"
+                          className="size-4 accent-primary"
+                          checked={draft.participation?.interests.includes(i.value)}
+                          onChange={(e) => {
+                            const p = draft.participation ?? { interested: true, interests: [] };
+                            update({
+                              participation: {
+                                ...p,
+                                interests: e.target.checked
+                                  ? [...p.interests, i.value]
+                                  : p.interests.filter((v) => v !== i.value),
+                              },
+                            });
+                          }}
+                        />
+                        {i.label}
+                      </label>
+                    ))}
+                  </fieldset>
+                )}
+              </div>
+            )}
+            {step === 5 && (
+              <div className="space-y-7">
+                <DossierSummary
+                  profile={draft.profile ?? {}}
+                  residence={draft.residence ?? {}}
+                  activity={draft.activity ?? {}}
+                  participation={draft.participation}
+                />
+                <div className="flex flex-wrap gap-2">
+                  {[1, 2, 3, 4].map((i) => (
+                    <Button
+                      key={i}
+                      variant="outline"
+                      size="sm"
+                      type="button"
+                      onClick={() => move(i)}
+                    >
+                      Modifier : {STEPS[i]}
+                    </Button>
+                  ))}
+                </div>
+                <label className="flex items-start gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    className="mt-1 size-4 accent-primary"
+                    checked={confirmed}
+                    onChange={(e) => setConfirmed(e.target.checked)}
+                  />
+                  Je confirme l’exactitude des informations de ce dossier de démonstration.
+                </label>
+                {errors["confirm"] && (
+                  <p role="alert" className="text-sm text-danger">
+                    {errors["confirm"]}
+                  </p>
+                )}
+              </div>
+            )}
+            <div className="mt-9 flex flex-wrap items-center justify-between gap-3 border-t pt-6">
+              <Button
+                variant="ghost"
+                type="button"
+                disabled={step === 0}
+                onClick={() => move(step - 1)}
+              >
+                <ArrowLeft />
+                Retour
+              </Button>
+              <Button type="submit" disabled={busy || !ready}>
+                {step === 5 ? (
+                  <>
+                    <Send />
+                    {busy ? "Envoi…" : "Soumettre mon dossier"}
+                  </>
+                ) : (
+                  <>
+                    Continuer <ArrowRight />
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </section>
+        <aside className="hidden lg:block">
+          <ShieldCheck className="mb-4 size-8 text-primary" />
+          <h3 className="text-base">Une démarche de confiance</h3>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Vos coordonnées ne sont jamais affichées dans l’Observatoire.
+          </p>
+          <div className="mt-7 border-t pt-5">
+            <p className="text-sm font-semibold">Besoin d’un accompagnement ?</p>
+            <Link to="/contact" className="mt-2 inline-flex items-center gap-2 text-sm text-copper">
+              Contacter le Centre <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}
+export function Confirmation({ reference }: { reference: string }) {
+  const app = useApp(),
+    session = useSession();
+  const dossier = app.dossiers.find(
+    (d) => d.reference === reference && d.ownerUserId === session?.account.userId,
+  );
+  return (
+    <div className="container-page py-16">
+      <div className="mx-auto max-w-2xl text-center">
+        <CheckCircle2 className="mx-auto mb-6 size-14 text-primary" />
+        <p className="eyebrow mb-4">Dossier de démonstration reçu</p>
+        <h1 className="text-3xl md:text-4xl">Merci pour votre participation.</h1>
+        <p className="mt-5 text-muted-foreground">
+          {dossier
+            ? "Votre dossier est soumis. Vous pourrez suivre sa vérification dans votre espace membre."
+            : "Consultez votre espace membre pour retrouver votre dossier et sa référence."}
+        </p>
+        {dossier && (
+          <div className="my-8 border-y py-6">
+            <p className="text-xs text-muted-foreground">VOTRE RÉFÉRENCE</p>
+            <p className="mt-2 text-2xl font-bold text-primary">{dossier.reference}</p>
+          </div>
+        )}
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Button asChild>
+            <Link to="/membre/dossier">
+              <FileCheck2 />
+              Suivre mon dossier
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/">Retour à l’accueil</Link>
+          </Button>
+        </div>
+        <p className="mt-8 text-xs text-muted-foreground">
+          Aucune donnée n’a été envoyée au Centre. Conservez cet appareil pour retrouver votre démo.
+        </p>
+      </div>
+    </div>
+  );
+}
