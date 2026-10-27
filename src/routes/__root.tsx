@@ -85,13 +85,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Culture, communauté et recensement HAOUSSA au Cameroun." },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "HAOUSSA — Centre culturel et communautaire" },
-      { property: "og:description", content: "Culture, communauté et recensement HAOUSSA au Cameroun." },
+      {
+        property: "og:description",
+        content: "Culture, communauté et recensement HAOUSSA au Cameroun.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -125,7 +131,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <AppShell><Outlet /></AppShell>
+      <AppShell>
+        <Outlet />
+      </AppShell>
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );

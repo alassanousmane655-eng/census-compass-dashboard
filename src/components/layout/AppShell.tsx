@@ -1,22 +1,333 @@
-import { useState, type ReactNode } from 'react';
-import { Link, useLocation } from '@tanstack/react-router';
-import { ArrowUpRight, Menu, X, ShieldCheck, LayoutDashboard, ClipboardList, Users, BarChart3, MapPin, Layers, FileText, Download, MessagesSquare, Settings, ScrollText, LogOut, HeartHandshake, CalendarDays, CopyCheck } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Logo } from '@/components/brand/Logo';
-import { useSession, useActingStaff, useApp, setActingStaff, signOut } from '@/services/store';
-import { can, ROLE_LABELS, type Permission } from '@/domain/permissions';
-import { regionName } from '@/data/territory-utils';
-import { cn } from '@/lib/utils';
-const publicLinks = [{ to:'/' ,label:'Accueil' },{to:'/le-centre',label:'Le Centre'},{to:'/culture',label:'Culture & communauté'},{to:'/recensement',label:'Recensement'},{to:'/observatoire',label:'Observatoire'}] as const;
-const memberLinks = [{to:'/membre',label:'Vue d’ensemble',icon:LayoutDashboard},{to:'/membre/dossier',label:'Mon dossier',icon:ClipboardList},{to:'/membre/profil',label:'Mon profil',icon:Users},{to:'/membre/preferences',label:'Préférences',icon:Settings},{to:'/membre/demandes',label:'Mes données',icon:ShieldCheck},{to:'/membre/aide',label:'Aide & contact',icon:HeartHandshake}] as const;
-export const adminLinks: {to:string;label:string;icon:typeof Users;permission?:Permission}[] = [
- {to:'/admin',label:'Vue d’ensemble',icon:LayoutDashboard}, {to:'/admin/dossiers',label:'Dossiers',icon:ClipboardList,permission:'dossier.lire'}, {to:'/admin/saisie',label:'Saisie assistée',icon:CopyCheck,permission:'dossier.saisie_assistee'}, {to:'/admin/doublons',label:'Doublons potentiels',icon:Users,permission:'doublons.examiner'}, {to:'/admin/campagnes',label:'Campagnes',icon:CalendarDays,permission:'campagnes.gerer'}, {to:'/admin/territoires',label:'Territoires',icon:MapPin,permission:'territoires.gerer'}, {to:'/admin/secteurs',label:'Secteurs',icon:Layers,permission:'secteurs.gerer'}, {to:'/admin/utilisateurs',label:'Utilisateurs & rôles',icon:Users,permission:'utilisateurs.gerer'}, {to:'/admin/contenu',label:'Contenu public',icon:FileText,permission:'contenu.editer'}, {to:'/admin/exports',label:'Exports agrégés',icon:Download,permission:'export.agrege'}, {to:'/admin/demandes',label:'Demandes de données',icon:MessagesSquare,permission:'demandes.traiter'}, {to:'/admin/audit',label:'Journal d’audit',icon:ScrollText,permission:'audit.lire'}, {to:'/admin/parametres',label:'Paramètres',icon:Settings,permission:'parametres.gerer'}];
-export function AppShell({children}:{children:ReactNode}) {
- const pathname=useLocation({select:s=>s.pathname}); const session=useSession(); const staff=useActingStaff(); const app=useApp(); const [open,setOpen]=useState(false);
- const admin=pathname.startsWith('/admin'), member=pathname.startsWith('/membre');
- if(admin||member) return <div className="min-h-screen bg-background"><header className="flex min-h-20 items-center justify-between gap-4 border-b bg-paper px-5 lg:px-8"><Logo/><div className="flex items-center gap-3"><span className="hidden text-sm text-muted-foreground sm:block">{admin?'Administration':'Espace membre'}</span><Button variant="ghost" size="icon" aria-label="Ouvrir le menu" onClick={()=>setOpen(!open)} className="lg:hidden"><Menu/></Button><Button variant="outline" size="sm" asChild><Link to="/">Site public <ArrowUpRight/></Link></Button></div></header><div className="flex"><aside className={cn('w-64 shrink-0 border-r bg-paper p-5 lg:block',open?'fixed inset-y-20 left-0 z-40 overflow-auto shadow-soft':'hidden')}>
- <p className="mb-5 text-xs font-semibold uppercase text-muted-foreground">{admin?'Pilotage du recensement':'Mon espace'}</p><nav aria-label="Navigation de l’espace" className="space-y-1">{(admin?adminLinks.filter(l=>!l.permission||can(staff.role,l.permission)):memberLinks).map(l=><Button key={l.to} asChild variant="ghost" className={cn('h-auto min-h-11 w-full justify-start rounded-md px-3 py-2 text-left whitespace-normal',pathname===l.to&&'bg-primary-soft text-primary')}><Link to={l.to} onClick={()=>setOpen(false)}><l.icon/>{l.label}</Link></Button>)}</nav><div className="mt-8 border-t pt-5">{admin?<><label className="text-xs font-semibold" htmlFor="acting-role">Rôle de démonstration</label><select id="acting-role" className="field-input mt-2 text-xs" value={staff.id} onChange={e=>setActingStaff(e.target.value)}>{app.staff.filter(s=>s.status==='actif').map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select><p className="mt-3 text-xs text-muted-foreground">{ROLE_LABELS[staff.role]}<br/>{staff.scope==='national'?'Périmètre national':regionName(staff.scope)}</p></>:<><p className="break-words text-sm font-semibold">{session?.account.displayName??'Visiteur'}</p><Button variant="ghost" size="sm" onClick={signOut}><LogOut/>Quitter la démo</Button></>}</div></aside><main id="main" className="min-w-0 flex-1 p-5 md:p-8 lg:p-10">{children}</main></div><DemoNotice/></div>;
- return <><a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:z-50 focus:bg-paper focus:p-4">Aller au contenu</a><header className="relative z-40 border-b bg-background"><div className="container-page flex h-20 items-center justify-between gap-4"><Logo/><nav className="hidden items-center gap-6 xl:flex" aria-label="Navigation principale">{publicLinks.map(l=><Link key={l.to} to={l.to} className={cn('text-sm transition-colors hover:text-copper',pathname===l.to?'font-semibold text-primary':'text-muted-foreground')}>{l.label}</Link>)}</nav><div className="flex items-center gap-3"><Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild><Link to={session?'/membre':'/connexion'}>{session?'Mon espace':'Connexion'}</Link></Button><Button asChild size="sm" className="hidden sm:inline-flex"><Link to="/recensement/formulaire">Se faire recenser <ArrowUpRight/></Link></Button><Button size="icon" variant="ghost" aria-label={open?'Fermer le menu':'Ouvrir le menu'} className="xl:hidden" onClick={()=>setOpen(!open)}>{open?<X/>:<Menu/>}</Button></div></div>{open&&<nav className="absolute left-0 right-0 border-b bg-paper p-5 shadow-soft xl:hidden" aria-label="Menu mobile">{[...publicLinks,{to:'/contact',label:'Contact'},{to:'/connexion',label:'Connexion'}].map(l=><Link key={l.to} to={l.to} onClick={()=>setOpen(false)} className="block border-b py-3">{l.label}</Link>)}<Button asChild className="mt-4"><Link to="/recensement/formulaire" onClick={()=>setOpen(false)}>Se faire recenser <ArrowUpRight/></Link></Button></nav>}</header><main id="main">{children}</main><footer className="bg-primary py-12 text-inverse"><div className="container-page grid gap-8 md:grid-cols-3"><div><Logo inverse/><p className="mt-4 max-w-xs text-sm text-inverse/75">Un héritage vivant. Une communauté réunie. Un avenir à construire ensemble.</p></div><div className="grid grid-cols-2 gap-3 text-sm">{publicLinks.slice(1).map(l=><Link to={l.to} key={l.to}>{l.label}</Link>)}<Link to="/contact">Contact</Link><Link to="/recensement/protection">Protection des données</Link></div><div><p className="text-sm font-semibold">Nos espaces</p><div className="mt-3 flex flex-col gap-2 text-sm text-inverse/75"><Link to="/membre">Espace membre ↗</Link><Link to="/admin">Administration · démo ↗</Link></div></div></div><div className="container-page mt-10 flex flex-wrap justify-between gap-3 border-t border-inverse/20 pt-5 text-xs text-inverse/60"><span>© 2026 HAOUSSA · Centre culturel et communautaire</span><span>Français · Cameroun</span></div></footer><DemoNotice/></>;
+import { useState, type ReactNode } from "react";
+import { Link, useLocation } from "@tanstack/react-router";
+import {
+  ArrowUpRight,
+  Menu,
+  X,
+  ShieldCheck,
+  LayoutDashboard,
+  ClipboardList,
+  Users,
+  BarChart3,
+  MapPin,
+  Layers,
+  FileText,
+  Download,
+  MessagesSquare,
+  Settings,
+  ScrollText,
+  LogOut,
+  HeartHandshake,
+  CalendarDays,
+  CopyCheck,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/brand/Logo";
+import { useSession, useActingStaff, useApp, setActingStaff, signOut } from "@/services/store";
+import { can, ROLE_LABELS, type Permission } from "@/domain/permissions";
+import { regionName } from "@/data/territory-utils";
+import { cn } from "@/lib/utils";
+const publicLinks = [
+  { to: "/", label: "Accueil" },
+  { to: "/le-centre", label: "Le Centre" },
+  { to: "/culture", label: "Culture & communauté" },
+  { to: "/recensement", label: "Recensement" },
+  { to: "/observatoire", label: "Observatoire" },
+] as const;
+const memberLinks = [
+  { to: "/membre", label: "Vue d’ensemble", icon: LayoutDashboard },
+  { to: "/membre/dossier", label: "Mon dossier", icon: ClipboardList },
+  { to: "/membre/profil", label: "Mon profil", icon: Users },
+  { to: "/membre/preferences", label: "Préférences", icon: Settings },
+  { to: "/membre/demandes", label: "Mes données", icon: ShieldCheck },
+  { to: "/membre/aide", label: "Aide & contact", icon: HeartHandshake },
+] as const;
+export const adminLinks: {
+  to: string;
+  label: string;
+  icon: typeof Users;
+  permission?: Permission;
+}[] = [
+  { to: "/admin", label: "Vue d’ensemble", icon: LayoutDashboard },
+  { to: "/admin/dossiers", label: "Dossiers", icon: ClipboardList, permission: "dossier.lire" },
+  {
+    to: "/admin/saisie",
+    label: "Saisie assistée",
+    icon: CopyCheck,
+    permission: "dossier.saisie_assistee",
+  },
+  {
+    to: "/admin/doublons",
+    label: "Doublons potentiels",
+    icon: Users,
+    permission: "doublons.examiner",
+  },
+  { to: "/admin/campagnes", label: "Campagnes", icon: CalendarDays, permission: "campagnes.gerer" },
+  { to: "/admin/territoires", label: "Territoires", icon: MapPin, permission: "territoires.gerer" },
+  { to: "/admin/secteurs", label: "Secteurs", icon: Layers, permission: "secteurs.gerer" },
+  {
+    to: "/admin/utilisateurs",
+    label: "Utilisateurs & rôles",
+    icon: Users,
+    permission: "utilisateurs.gerer",
+  },
+  { to: "/admin/contenu", label: "Contenu public", icon: FileText, permission: "contenu.editer" },
+  { to: "/admin/exports", label: "Exports agrégés", icon: Download, permission: "export.agrege" },
+  {
+    to: "/admin/demandes",
+    label: "Demandes de données",
+    icon: MessagesSquare,
+    permission: "demandes.traiter",
+  },
+  { to: "/admin/audit", label: "Journal d’audit", icon: ScrollText, permission: "audit.lire" },
+  { to: "/admin/parametres", label: "Paramètres", icon: Settings, permission: "parametres.gerer" },
+];
+export function AppShell({ children }: { children: ReactNode }) {
+  const pathname = useLocation({ select: (s) => s.pathname });
+  const session = useSession();
+  const staff = useActingStaff();
+  const app = useApp();
+  const [open, setOpen] = useState(false);
+  const admin = pathname.startsWith("/admin"),
+    member = pathname.startsWith("/membre");
+  if (admin || member)
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="flex min-h-20 items-center justify-between gap-4 border-b bg-paper px-5 lg:px-8">
+          <Logo />
+          <div className="flex items-center gap-3">
+            <span className="hidden text-sm text-muted-foreground sm:block">
+              {admin ? "Administration" : "Espace membre"}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Ouvrir le menu"
+              onClick={() => setOpen(!open)}
+              className="lg:hidden"
+            >
+              <Menu />
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/">
+                Site public <ArrowUpRight />
+              </Link>
+            </Button>
+          </div>
+        </header>
+        <div className="flex">
+          <aside
+            className={cn(
+              "w-64 shrink-0 border-r bg-paper p-5 lg:block",
+              open ? "fixed inset-y-20 left-0 z-40 overflow-auto shadow-soft" : "hidden",
+            )}
+          >
+            <p className="mb-5 text-xs font-semibold uppercase text-muted-foreground">
+              {admin ? "Pilotage du recensement" : "Mon espace"}
+            </p>
+            <nav aria-label="Navigation de l’espace" className="space-y-1">
+              {(admin
+                ? adminLinks.filter((l) => !l.permission || can(staff.role, l.permission))
+                : memberLinks
+              ).map((l) => (
+                <Button
+                  key={l.to}
+                  asChild
+                  variant="ghost"
+                  className={cn(
+                    "h-auto min-h-11 w-full justify-start rounded-md px-3 py-2 text-left whitespace-normal",
+                    pathname === l.to && "bg-primary-soft text-primary",
+                  )}
+                >
+                  <Link to={l.to} onClick={() => setOpen(false)}>
+                    <l.icon />
+                    {l.label}
+                  </Link>
+                </Button>
+              ))}
+            </nav>
+            <div className="mt-8 border-t pt-5">
+              {admin ? (
+                <>
+                  <label className="text-xs font-semibold" htmlFor="acting-role">
+                    Rôle de démonstration
+                  </label>
+                  <select
+                    id="acting-role"
+                    className="field-input mt-2 text-xs"
+                    value={staff.id}
+                    onChange={(e) => setActingStaff(e.target.value)}
+                  >
+                    {app.staff
+                      .filter((s) => s.status === "actif")
+                      .map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.name}
+                        </option>
+                      ))}
+                  </select>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    {ROLE_LABELS[staff.role]}
+                    <br />
+                    {staff.scope === "national" ? "Périmètre national" : regionName(staff.scope)}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="break-words text-sm font-semibold">
+                    {session?.account.displayName ?? "Visiteur"}
+                  </p>
+                  <Button variant="ghost" size="sm" onClick={signOut}>
+                    <LogOut />
+                    Quitter la démo
+                  </Button>
+                </>
+              )}
+            </div>
+          </aside>
+          <main id="main" className="min-w-0 flex-1 p-5 md:p-8 lg:p-10">
+            {children}
+          </main>
+        </div>
+        <DemoNotice />
+      </div>
+    );
+  return (
+    <>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:z-50 focus:bg-paper focus:p-4"
+      >
+        Aller au contenu
+      </a>
+      <header className="relative z-40 border-b bg-background">
+        <div className="container-page flex h-20 items-center justify-between gap-4">
+          <Logo />
+          <nav className="hidden items-center gap-6 xl:flex" aria-label="Navigation principale">
+            {publicLinks.map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                className={cn(
+                  "text-sm transition-colors hover:text-copper",
+                  pathname === l.to ? "font-semibold text-primary" : "text-muted-foreground",
+                )}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild>
+              <Link to={session ? "/membre" : "/connexion"}>
+                {session ? "Mon espace" : "Connexion"}
+              </Link>
+            </Button>
+            <Button asChild size="sm" className="hidden sm:inline-flex">
+              <Link to="/recensement/formulaire">
+                Se faire recenser <ArrowUpRight />
+              </Link>
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+              className="xl:hidden"
+              onClick={() => setOpen(!open)}
+            >
+              {open ? <X /> : <Menu />}
+            </Button>
+          </div>
+        </div>
+        {open && (
+          <nav
+            className="absolute left-0 right-0 border-b bg-paper p-5 shadow-soft xl:hidden"
+            aria-label="Menu mobile"
+          >
+            {[
+              ...publicLinks,
+              { to: "/contact", label: "Contact" },
+              { to: "/connexion", label: "Connexion" },
+            ].map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                onClick={() => setOpen(false)}
+                className="block border-b py-3"
+              >
+                {l.label}
+              </Link>
+            ))}
+            <Button asChild className="mt-4">
+              <Link to="/recensement/formulaire" onClick={() => setOpen(false)}>
+                Se faire recenser <ArrowUpRight />
+              </Link>
+            </Button>
+          </nav>
+        )}
+      </header>
+      <main id="main">{children}</main>
+      <footer className="bg-primary py-12 text-inverse">
+        <div className="container-page grid gap-8 md:grid-cols-3">
+          <div>
+            <Logo inverse />
+            <p className="mt-4 max-w-xs text-sm text-inverse/75">
+              Un héritage vivant. Une communauté réunie. Un avenir à construire ensemble.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            {publicLinks.slice(1).map((l) => (
+              <Link to={l.to} key={l.to}>
+                {l.label}
+              </Link>
+            ))}
+            <Link to="/contact">Contact</Link>
+            <Link to="/recensement/protection">Protection des données</Link>
+          </div>
+          <div>
+            <p className="text-sm font-semibold">Nos espaces</p>
+            <div className="mt-3 flex flex-col gap-2 text-sm text-inverse/75">
+              <Link to="/membre">Espace membre ↗</Link>
+              <Link to="/admin">Administration · démo ↗</Link>
+            </div>
+          </div>
+        </div>
+        <div className="container-page mt-10 flex flex-wrap justify-between gap-3 border-t border-inverse/20 pt-5 text-xs text-inverse/60">
+          <span>© 2026 HAOUSSA · Centre culturel et communautaire</span>
+          <span>Français · Cameroun</span>
+        </div>
+      </footer>
+      <DemoNotice />
+    </>
+  );
 }
-function DemoNotice(){return <div className="border-t bg-warning-bg px-4 py-2 text-center text-xs text-warning">Démonstration · données fictives · aucune transmission au Centre. N’utilisez pas de données personnelles réelles.</div>}
-export function PageHeader({eyebrow,title,description,action}:{eyebrow?:string;title:string;description?:string;action?:ReactNode}){return <div className="mb-8 flex flex-wrap items-start justify-between gap-4"><div>{eyebrow&&<p className="eyebrow mb-3">{eyebrow}</p>}<h1 className="text-3xl md:text-4xl">{title}</h1>{description&&<p className="mt-3 max-w-2xl text-muted-foreground">{description}</p>}</div>{action}</div>}
+function DemoNotice() {
+  return (
+    <div className="border-t bg-warning-bg px-4 py-2 text-center text-xs text-warning">
+      Démonstration · données fictives · aucune transmission au Centre. N’utilisez pas de données
+      personnelles réelles.
+    </div>
+  );
+}
+export function PageHeader({
+  eyebrow,
+  title,
+  description,
+  action,
+}: {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+      <div>
+        {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
+        <h1 className="text-3xl md:text-4xl">{title}</h1>
+        {description && <p className="mt-3 max-w-2xl text-muted-foreground">{description}</p>}
+      </div>
+      {action}
+    </div>
+  );
+}
