@@ -10,33 +10,505 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConnexionRouteImport } from './routes/connexion'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as LeCentreRouteImport } from './routes/le-centre'
+import { Route as ObservatoireRouteImport } from './routes/observatoire'
+import { Route as SInscrireRouteImport } from './routes/s-inscrire'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
+import { Route as AdminCampagnesRouteImport } from './routes/admin.campagnes'
+import { Route as AdminContenuRouteImport } from './routes/admin.contenu'
+import { Route as AdminDemandesRouteImport } from './routes/admin.demandes'
+import { Route as AdminDossiersRouteImport } from './routes/admin.dossiers'
+import { Route as AdminDoublonsRouteImport } from './routes/admin.doublons'
+import { Route as AdminExportsRouteImport } from './routes/admin.exports'
+import { Route as AdminParametresRouteImport } from './routes/admin.parametres'
+import { Route as AdminSaisieRouteImport } from './routes/admin.saisie'
+import { Route as AdminSecteursRouteImport } from './routes/admin.secteurs'
+import { Route as AdminTerritoiresRouteImport } from './routes/admin.territoires'
+import { Route as AdminUtilisateursRouteImport } from './routes/admin.utilisateurs'
+import { Route as CultureIndexRouteImport } from './routes/culture.index'
+import { Route as CultureActualitesRouteImport } from './routes/culture.actualites'
+import { Route as CultureAgendaRouteImport } from './routes/culture.agenda'
+import { Route as CultureGalerieRouteImport } from './routes/culture.galerie'
+import { Route as CultureProgrammesRouteImport } from './routes/culture.programmes'
+import { Route as MembreIndexRouteImport } from './routes/membre.index'
+import { Route as MembreAideRouteImport } from './routes/membre.aide'
+import { Route as MembreCorrectionsRouteImport } from './routes/membre.corrections'
+import { Route as MembreDemandesRouteImport } from './routes/membre.demandes'
+import { Route as MembreDossierRouteImport } from './routes/membre.dossier'
+import { Route as MembrePreferencesRouteImport } from './routes/membre.preferences'
+import { Route as MembreProfilRouteImport } from './routes/membre.profil'
+import { Route as RecensementIndexRouteImport } from './routes/recensement.index'
+import { Route as RecensementConfirmationRouteImport } from './routes/recensement.confirmation'
+import { Route as RecensementFaqRouteImport } from './routes/recensement.faq'
+import { Route as RecensementFormulaireRouteImport } from './routes/recensement.formulaire'
+import { Route as RecensementProtectionRouteImport } from './routes/recensement.protection'
+import { Route as AdminDossiersIdRouteImport } from './routes/admin.dossiers_.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConnexionRoute = ConnexionRouteImport.update({
+  id: '/connexion',
+  path: '/connexion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeCentreRoute = LeCentreRouteImport.update({
+  id: '/le-centre',
+  path: '/le-centre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ObservatoireRoute = ObservatoireRouteImport.update({
+  id: '/observatoire',
+  path: '/observatoire',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SInscrireRoute = SInscrireRouteImport.update({
+  id: '/s-inscrire',
+  path: '/s-inscrire',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/admin/audit',
+  path: '/admin/audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCampagnesRoute = AdminCampagnesRouteImport.update({
+  id: '/admin/campagnes',
+  path: '/admin/campagnes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminContenuRoute = AdminContenuRouteImport.update({
+  id: '/admin/contenu',
+  path: '/admin/contenu',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDemandesRoute = AdminDemandesRouteImport.update({
+  id: '/admin/demandes',
+  path: '/admin/demandes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDossiersRoute = AdminDossiersRouteImport.update({
+  id: '/admin/dossiers',
+  path: '/admin/dossiers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDoublonsRoute = AdminDoublonsRouteImport.update({
+  id: '/admin/doublons',
+  path: '/admin/doublons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminExportsRoute = AdminExportsRouteImport.update({
+  id: '/admin/exports',
+  path: '/admin/exports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminParametresRoute = AdminParametresRouteImport.update({
+  id: '/admin/parametres',
+  path: '/admin/parametres',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSaisieRoute = AdminSaisieRouteImport.update({
+  id: '/admin/saisie',
+  path: '/admin/saisie',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSecteursRoute = AdminSecteursRouteImport.update({
+  id: '/admin/secteurs',
+  path: '/admin/secteurs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminTerritoiresRoute = AdminTerritoiresRouteImport.update({
+  id: '/admin/territoires',
+  path: '/admin/territoires',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUtilisateursRoute = AdminUtilisateursRouteImport.update({
+  id: '/admin/utilisateurs',
+  path: '/admin/utilisateurs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CultureIndexRoute = CultureIndexRouteImport.update({
+  id: '/culture/',
+  path: '/culture/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CultureActualitesRoute = CultureActualitesRouteImport.update({
+  id: '/culture/actualites',
+  path: '/culture/actualites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CultureAgendaRoute = CultureAgendaRouteImport.update({
+  id: '/culture/agenda',
+  path: '/culture/agenda',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CultureGalerieRoute = CultureGalerieRouteImport.update({
+  id: '/culture/galerie',
+  path: '/culture/galerie',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CultureProgrammesRoute = CultureProgrammesRouteImport.update({
+  id: '/culture/programmes',
+  path: '/culture/programmes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembreIndexRoute = MembreIndexRouteImport.update({
+  id: '/membre/',
+  path: '/membre/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembreAideRoute = MembreAideRouteImport.update({
+  id: '/membre/aide',
+  path: '/membre/aide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembreCorrectionsRoute = MembreCorrectionsRouteImport.update({
+  id: '/membre/corrections',
+  path: '/membre/corrections',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembreDemandesRoute = MembreDemandesRouteImport.update({
+  id: '/membre/demandes',
+  path: '/membre/demandes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembreDossierRoute = MembreDossierRouteImport.update({
+  id: '/membre/dossier',
+  path: '/membre/dossier',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembrePreferencesRoute = MembrePreferencesRouteImport.update({
+  id: '/membre/preferences',
+  path: '/membre/preferences',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembreProfilRoute = MembreProfilRouteImport.update({
+  id: '/membre/profil',
+  path: '/membre/profil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecensementIndexRoute = RecensementIndexRouteImport.update({
+  id: '/recensement/',
+  path: '/recensement/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecensementConfirmationRoute = RecensementConfirmationRouteImport.update({
+  id: '/recensement/confirmation',
+  path: '/recensement/confirmation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecensementFaqRoute = RecensementFaqRouteImport.update({
+  id: '/recensement/faq',
+  path: '/recensement/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecensementFormulaireRoute = RecensementFormulaireRouteImport.update({
+  id: '/recensement/formulaire',
+  path: '/recensement/formulaire',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecensementProtectionRoute = RecensementProtectionRouteImport.update({
+  id: '/recensement/protection',
+  path: '/recensement/protection',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDossiersIdRoute = AdminDossiersIdRouteImport.update({
+  id: '/admin/dossiers_/$id',
+  path: '/admin/dossiers/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/connexion': typeof ConnexionRoute
+  '/contact': typeof ContactRoute
+  '/le-centre': typeof LeCentreRoute
+  '/observatoire': typeof ObservatoireRoute
+  '/s-inscrire': typeof SInscrireRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/campagnes': typeof AdminCampagnesRoute
+  '/admin/contenu': typeof AdminContenuRoute
+  '/admin/demandes': typeof AdminDemandesRoute
+  '/admin/dossiers': typeof AdminDossiersRoute
+  '/admin/doublons': typeof AdminDoublonsRoute
+  '/admin/exports': typeof AdminExportsRoute
+  '/admin/parametres': typeof AdminParametresRoute
+  '/admin/saisie': typeof AdminSaisieRoute
+  '/admin/secteurs': typeof AdminSecteursRoute
+  '/admin/territoires': typeof AdminTerritoiresRoute
+  '/admin/utilisateurs': typeof AdminUtilisateursRoute
+  '/culture/actualites': typeof CultureActualitesRoute
+  '/culture/agenda': typeof CultureAgendaRoute
+  '/culture/galerie': typeof CultureGalerieRoute
+  '/culture/programmes': typeof CultureProgrammesRoute
+  '/membre/aide': typeof MembreAideRoute
+  '/membre/corrections': typeof MembreCorrectionsRoute
+  '/membre/demandes': typeof MembreDemandesRoute
+  '/membre/dossier': typeof MembreDossierRoute
+  '/membre/preferences': typeof MembrePreferencesRoute
+  '/membre/profil': typeof MembreProfilRoute
+  '/recensement/confirmation': typeof RecensementConfirmationRoute
+  '/recensement/faq': typeof RecensementFaqRoute
+  '/recensement/formulaire': typeof RecensementFormulaireRoute
+  '/recensement/protection': typeof RecensementProtectionRoute
+  '/admin/': typeof AdminIndexRoute
+  '/culture/': typeof CultureIndexRoute
+  '/membre/': typeof MembreIndexRoute
+  '/recensement/': typeof RecensementIndexRoute
+  '/admin/dossiers/$id': typeof AdminDossiersIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/connexion': typeof ConnexionRoute
+  '/contact': typeof ContactRoute
+  '/le-centre': typeof LeCentreRoute
+  '/observatoire': typeof ObservatoireRoute
+  '/s-inscrire': typeof SInscrireRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/campagnes': typeof AdminCampagnesRoute
+  '/admin/contenu': typeof AdminContenuRoute
+  '/admin/demandes': typeof AdminDemandesRoute
+  '/admin/dossiers': typeof AdminDossiersRoute
+  '/admin/doublons': typeof AdminDoublonsRoute
+  '/admin/exports': typeof AdminExportsRoute
+  '/admin/parametres': typeof AdminParametresRoute
+  '/admin/saisie': typeof AdminSaisieRoute
+  '/admin/secteurs': typeof AdminSecteursRoute
+  '/admin/territoires': typeof AdminTerritoiresRoute
+  '/admin/utilisateurs': typeof AdminUtilisateursRoute
+  '/culture/actualites': typeof CultureActualitesRoute
+  '/culture/agenda': typeof CultureAgendaRoute
+  '/culture/galerie': typeof CultureGalerieRoute
+  '/culture/programmes': typeof CultureProgrammesRoute
+  '/membre/aide': typeof MembreAideRoute
+  '/membre/corrections': typeof MembreCorrectionsRoute
+  '/membre/demandes': typeof MembreDemandesRoute
+  '/membre/dossier': typeof MembreDossierRoute
+  '/membre/preferences': typeof MembrePreferencesRoute
+  '/membre/profil': typeof MembreProfilRoute
+  '/recensement/confirmation': typeof RecensementConfirmationRoute
+  '/recensement/faq': typeof RecensementFaqRoute
+  '/recensement/formulaire': typeof RecensementFormulaireRoute
+  '/recensement/protection': typeof RecensementProtectionRoute
+  '/admin': typeof AdminIndexRoute
+  '/culture': typeof CultureIndexRoute
+  '/membre': typeof MembreIndexRoute
+  '/recensement': typeof RecensementIndexRoute
+  '/admin/dossiers/$id': typeof AdminDossiersIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/connexion': typeof ConnexionRoute
+  '/contact': typeof ContactRoute
+  '/le-centre': typeof LeCentreRoute
+  '/observatoire': typeof ObservatoireRoute
+  '/s-inscrire': typeof SInscrireRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/campagnes': typeof AdminCampagnesRoute
+  '/admin/contenu': typeof AdminContenuRoute
+  '/admin/demandes': typeof AdminDemandesRoute
+  '/admin/dossiers': typeof AdminDossiersRoute
+  '/admin/doublons': typeof AdminDoublonsRoute
+  '/admin/exports': typeof AdminExportsRoute
+  '/admin/parametres': typeof AdminParametresRoute
+  '/admin/saisie': typeof AdminSaisieRoute
+  '/admin/secteurs': typeof AdminSecteursRoute
+  '/admin/territoires': typeof AdminTerritoiresRoute
+  '/admin/utilisateurs': typeof AdminUtilisateursRoute
+  '/culture/actualites': typeof CultureActualitesRoute
+  '/culture/agenda': typeof CultureAgendaRoute
+  '/culture/galerie': typeof CultureGalerieRoute
+  '/culture/programmes': typeof CultureProgrammesRoute
+  '/membre/aide': typeof MembreAideRoute
+  '/membre/corrections': typeof MembreCorrectionsRoute
+  '/membre/demandes': typeof MembreDemandesRoute
+  '/membre/dossier': typeof MembreDossierRoute
+  '/membre/preferences': typeof MembrePreferencesRoute
+  '/membre/profil': typeof MembreProfilRoute
+  '/recensement/confirmation': typeof RecensementConfirmationRoute
+  '/recensement/faq': typeof RecensementFaqRoute
+  '/recensement/formulaire': typeof RecensementFormulaireRoute
+  '/recensement/protection': typeof RecensementProtectionRoute
+  '/admin/': typeof AdminIndexRoute
+  '/culture/': typeof CultureIndexRoute
+  '/membre/': typeof MembreIndexRoute
+  '/recensement/': typeof RecensementIndexRoute
+  '/admin/dossiers_/$id': typeof AdminDossiersIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/connexion'
+    | '/contact'
+    | '/le-centre'
+    | '/observatoire'
+    | '/s-inscrire'
+    | '/admin/audit'
+    | '/admin/campagnes'
+    | '/admin/contenu'
+    | '/admin/demandes'
+    | '/admin/dossiers'
+    | '/admin/doublons'
+    | '/admin/exports'
+    | '/admin/parametres'
+    | '/admin/saisie'
+    | '/admin/secteurs'
+    | '/admin/territoires'
+    | '/admin/utilisateurs'
+    | '/culture/actualites'
+    | '/culture/agenda'
+    | '/culture/galerie'
+    | '/culture/programmes'
+    | '/membre/aide'
+    | '/membre/corrections'
+    | '/membre/demandes'
+    | '/membre/dossier'
+    | '/membre/preferences'
+    | '/membre/profil'
+    | '/recensement/confirmation'
+    | '/recensement/faq'
+    | '/recensement/formulaire'
+    | '/recensement/protection'
+    | '/admin/'
+    | '/culture/'
+    | '/membre/'
+    | '/recensement/'
+    | '/admin/dossiers/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/connexion'
+    | '/contact'
+    | '/le-centre'
+    | '/observatoire'
+    | '/s-inscrire'
+    | '/admin/audit'
+    | '/admin/campagnes'
+    | '/admin/contenu'
+    | '/admin/demandes'
+    | '/admin/dossiers'
+    | '/admin/doublons'
+    | '/admin/exports'
+    | '/admin/parametres'
+    | '/admin/saisie'
+    | '/admin/secteurs'
+    | '/admin/territoires'
+    | '/admin/utilisateurs'
+    | '/culture/actualites'
+    | '/culture/agenda'
+    | '/culture/galerie'
+    | '/culture/programmes'
+    | '/membre/aide'
+    | '/membre/corrections'
+    | '/membre/demandes'
+    | '/membre/dossier'
+    | '/membre/preferences'
+    | '/membre/profil'
+    | '/recensement/confirmation'
+    | '/recensement/faq'
+    | '/recensement/formulaire'
+    | '/recensement/protection'
+    | '/admin'
+    | '/culture'
+    | '/membre'
+    | '/recensement'
+    | '/admin/dossiers/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/connexion'
+    | '/contact'
+    | '/le-centre'
+    | '/observatoire'
+    | '/s-inscrire'
+    | '/admin/audit'
+    | '/admin/campagnes'
+    | '/admin/contenu'
+    | '/admin/demandes'
+    | '/admin/dossiers'
+    | '/admin/doublons'
+    | '/admin/exports'
+    | '/admin/parametres'
+    | '/admin/saisie'
+    | '/admin/secteurs'
+    | '/admin/territoires'
+    | '/admin/utilisateurs'
+    | '/culture/actualites'
+    | '/culture/agenda'
+    | '/culture/galerie'
+    | '/culture/programmes'
+    | '/membre/aide'
+    | '/membre/corrections'
+    | '/membre/demandes'
+    | '/membre/dossier'
+    | '/membre/preferences'
+    | '/membre/profil'
+    | '/recensement/confirmation'
+    | '/recensement/faq'
+    | '/recensement/formulaire'
+    | '/recensement/protection'
+    | '/admin/'
+    | '/culture/'
+    | '/membre/'
+    | '/recensement/'
+    | '/admin/dossiers_/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ConnexionRoute: typeof ConnexionRoute
+  ContactRoute: typeof ContactRoute
+  LeCentreRoute: typeof LeCentreRoute
+  ObservatoireRoute: typeof ObservatoireRoute
+  SInscrireRoute: typeof SInscrireRoute
+  AdminAuditRoute: typeof AdminAuditRoute
+  AdminCampagnesRoute: typeof AdminCampagnesRoute
+  AdminContenuRoute: typeof AdminContenuRoute
+  AdminDemandesRoute: typeof AdminDemandesRoute
+  AdminDossiersRoute: typeof AdminDossiersRoute
+  AdminDoublonsRoute: typeof AdminDoublonsRoute
+  AdminExportsRoute: typeof AdminExportsRoute
+  AdminParametresRoute: typeof AdminParametresRoute
+  AdminSaisieRoute: typeof AdminSaisieRoute
+  AdminSecteursRoute: typeof AdminSecteursRoute
+  AdminTerritoiresRoute: typeof AdminTerritoiresRoute
+  AdminUtilisateursRoute: typeof AdminUtilisateursRoute
+  CultureActualitesRoute: typeof CultureActualitesRoute
+  CultureAgendaRoute: typeof CultureAgendaRoute
+  CultureGalerieRoute: typeof CultureGalerieRoute
+  CultureProgrammesRoute: typeof CultureProgrammesRoute
+  MembreAideRoute: typeof MembreAideRoute
+  MembreCorrectionsRoute: typeof MembreCorrectionsRoute
+  MembreDemandesRoute: typeof MembreDemandesRoute
+  MembreDossierRoute: typeof MembreDossierRoute
+  MembrePreferencesRoute: typeof MembrePreferencesRoute
+  MembreProfilRoute: typeof MembreProfilRoute
+  RecensementConfirmationRoute: typeof RecensementConfirmationRoute
+  RecensementFaqRoute: typeof RecensementFaqRoute
+  RecensementFormulaireRoute: typeof RecensementFormulaireRoute
+  RecensementProtectionRoute: typeof RecensementProtectionRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  CultureIndexRoute: typeof CultureIndexRoute
+  MembreIndexRoute: typeof MembreIndexRoute
+  RecensementIndexRoute: typeof RecensementIndexRoute
+  AdminDossiersIdRoute: typeof AdminDossiersIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +520,299 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/connexion': {
+      id: '/connexion'
+      path: '/connexion'
+      fullPath: '/connexion'
+      preLoaderRoute: typeof ConnexionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/le-centre': {
+      id: '/le-centre'
+      path: '/le-centre'
+      fullPath: '/le-centre'
+      preLoaderRoute: typeof LeCentreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/observatoire': {
+      id: '/observatoire'
+      path: '/observatoire'
+      fullPath: '/observatoire'
+      preLoaderRoute: typeof ObservatoireRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/s-inscrire': {
+      id: '/s-inscrire'
+      path: '/s-inscrire'
+      fullPath: '/s-inscrire'
+      preLoaderRoute: typeof SInscrireRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/admin/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/campagnes': {
+      id: '/admin/campagnes'
+      path: '/admin/campagnes'
+      fullPath: '/admin/campagnes'
+      preLoaderRoute: typeof AdminCampagnesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/contenu': {
+      id: '/admin/contenu'
+      path: '/admin/contenu'
+      fullPath: '/admin/contenu'
+      preLoaderRoute: typeof AdminContenuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/demandes': {
+      id: '/admin/demandes'
+      path: '/admin/demandes'
+      fullPath: '/admin/demandes'
+      preLoaderRoute: typeof AdminDemandesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/dossiers': {
+      id: '/admin/dossiers'
+      path: '/admin/dossiers'
+      fullPath: '/admin/dossiers'
+      preLoaderRoute: typeof AdminDossiersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/doublons': {
+      id: '/admin/doublons'
+      path: '/admin/doublons'
+      fullPath: '/admin/doublons'
+      preLoaderRoute: typeof AdminDoublonsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/exports': {
+      id: '/admin/exports'
+      path: '/admin/exports'
+      fullPath: '/admin/exports'
+      preLoaderRoute: typeof AdminExportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/parametres': {
+      id: '/admin/parametres'
+      path: '/admin/parametres'
+      fullPath: '/admin/parametres'
+      preLoaderRoute: typeof AdminParametresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/saisie': {
+      id: '/admin/saisie'
+      path: '/admin/saisie'
+      fullPath: '/admin/saisie'
+      preLoaderRoute: typeof AdminSaisieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/secteurs': {
+      id: '/admin/secteurs'
+      path: '/admin/secteurs'
+      fullPath: '/admin/secteurs'
+      preLoaderRoute: typeof AdminSecteursRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/territoires': {
+      id: '/admin/territoires'
+      path: '/admin/territoires'
+      fullPath: '/admin/territoires'
+      preLoaderRoute: typeof AdminTerritoiresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/utilisateurs': {
+      id: '/admin/utilisateurs'
+      path: '/admin/utilisateurs'
+      fullPath: '/admin/utilisateurs'
+      preLoaderRoute: typeof AdminUtilisateursRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/culture/': {
+      id: '/culture/'
+      path: '/culture'
+      fullPath: '/culture/'
+      preLoaderRoute: typeof CultureIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/culture/actualites': {
+      id: '/culture/actualites'
+      path: '/culture/actualites'
+      fullPath: '/culture/actualites'
+      preLoaderRoute: typeof CultureActualitesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/culture/agenda': {
+      id: '/culture/agenda'
+      path: '/culture/agenda'
+      fullPath: '/culture/agenda'
+      preLoaderRoute: typeof CultureAgendaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/culture/galerie': {
+      id: '/culture/galerie'
+      path: '/culture/galerie'
+      fullPath: '/culture/galerie'
+      preLoaderRoute: typeof CultureGalerieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/culture/programmes': {
+      id: '/culture/programmes'
+      path: '/culture/programmes'
+      fullPath: '/culture/programmes'
+      preLoaderRoute: typeof CultureProgrammesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membre/': {
+      id: '/membre/'
+      path: '/membre'
+      fullPath: '/membre/'
+      preLoaderRoute: typeof MembreIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membre/aide': {
+      id: '/membre/aide'
+      path: '/membre/aide'
+      fullPath: '/membre/aide'
+      preLoaderRoute: typeof MembreAideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membre/corrections': {
+      id: '/membre/corrections'
+      path: '/membre/corrections'
+      fullPath: '/membre/corrections'
+      preLoaderRoute: typeof MembreCorrectionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membre/demandes': {
+      id: '/membre/demandes'
+      path: '/membre/demandes'
+      fullPath: '/membre/demandes'
+      preLoaderRoute: typeof MembreDemandesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membre/dossier': {
+      id: '/membre/dossier'
+      path: '/membre/dossier'
+      fullPath: '/membre/dossier'
+      preLoaderRoute: typeof MembreDossierRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membre/preferences': {
+      id: '/membre/preferences'
+      path: '/membre/preferences'
+      fullPath: '/membre/preferences'
+      preLoaderRoute: typeof MembrePreferencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membre/profil': {
+      id: '/membre/profil'
+      path: '/membre/profil'
+      fullPath: '/membre/profil'
+      preLoaderRoute: typeof MembreProfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recensement/': {
+      id: '/recensement/'
+      path: '/recensement'
+      fullPath: '/recensement/'
+      preLoaderRoute: typeof RecensementIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recensement/confirmation': {
+      id: '/recensement/confirmation'
+      path: '/recensement/confirmation'
+      fullPath: '/recensement/confirmation'
+      preLoaderRoute: typeof RecensementConfirmationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recensement/faq': {
+      id: '/recensement/faq'
+      path: '/recensement/faq'
+      fullPath: '/recensement/faq'
+      preLoaderRoute: typeof RecensementFaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recensement/formulaire': {
+      id: '/recensement/formulaire'
+      path: '/recensement/formulaire'
+      fullPath: '/recensement/formulaire'
+      preLoaderRoute: typeof RecensementFormulaireRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recensement/protection': {
+      id: '/recensement/protection'
+      path: '/recensement/protection'
+      fullPath: '/recensement/protection'
+      preLoaderRoute: typeof RecensementProtectionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/dossiers_/$id': {
+      id: '/admin/dossiers_/$id'
+      path: '/admin/dossiers/$id'
+      fullPath: '/admin/dossiers/$id'
+      preLoaderRoute: typeof AdminDossiersIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ConnexionRoute: ConnexionRoute,
+  ContactRoute: ContactRoute,
+  LeCentreRoute: LeCentreRoute,
+  ObservatoireRoute: ObservatoireRoute,
+  SInscrireRoute: SInscrireRoute,
+  AdminAuditRoute: AdminAuditRoute,
+  AdminCampagnesRoute: AdminCampagnesRoute,
+  AdminContenuRoute: AdminContenuRoute,
+  AdminDemandesRoute: AdminDemandesRoute,
+  AdminDossiersRoute: AdminDossiersRoute,
+  AdminDoublonsRoute: AdminDoublonsRoute,
+  AdminExportsRoute: AdminExportsRoute,
+  AdminParametresRoute: AdminParametresRoute,
+  AdminSaisieRoute: AdminSaisieRoute,
+  AdminSecteursRoute: AdminSecteursRoute,
+  AdminTerritoiresRoute: AdminTerritoiresRoute,
+  AdminUtilisateursRoute: AdminUtilisateursRoute,
+  CultureActualitesRoute: CultureActualitesRoute,
+  CultureAgendaRoute: CultureAgendaRoute,
+  CultureGalerieRoute: CultureGalerieRoute,
+  CultureProgrammesRoute: CultureProgrammesRoute,
+  MembreAideRoute: MembreAideRoute,
+  MembreCorrectionsRoute: MembreCorrectionsRoute,
+  MembreDemandesRoute: MembreDemandesRoute,
+  MembreDossierRoute: MembreDossierRoute,
+  MembrePreferencesRoute: MembrePreferencesRoute,
+  MembreProfilRoute: MembreProfilRoute,
+  RecensementConfirmationRoute: RecensementConfirmationRoute,
+  RecensementFaqRoute: RecensementFaqRoute,
+  RecensementFormulaireRoute: RecensementFormulaireRoute,
+  RecensementProtectionRoute: RecensementProtectionRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  CultureIndexRoute: CultureIndexRoute,
+  MembreIndexRoute: MembreIndexRoute,
+  RecensementIndexRoute: RecensementIndexRoute,
+  AdminDossiersIdRoute: AdminDossiersIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
