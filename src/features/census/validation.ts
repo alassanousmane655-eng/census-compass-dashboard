@@ -18,7 +18,12 @@ export const profileSchema = z
         path: ["contact"],
         message: "Indiquez une adresse e-mail valide.",
       });
-    if (d.contactType === "telephone" && !/^\+?[\d\s()-]{8,20}$/.test(d.contact))
+    if (
+      d.contactType === "telephone" &&
+      (!/^\+?[\d\s()-]+$/.test(d.contact) ||
+        d.contact.replace(/\D/g, "").length < 8 ||
+        d.contact.replace(/\D/g, "").length > 15)
+    )
       ctx.addIssue({
         code: "custom",
         path: ["contact"],

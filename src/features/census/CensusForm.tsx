@@ -95,28 +95,28 @@ export function ProfileFields({
 }) {
   return (
     <div className="grid gap-5 sm:grid-cols-2">
-      <Field name="firstName" label="Prénom(s)" error={errors.firstName}>
+      <Field name="firstName" label="Prénom(s)" error={errors["firstName"]}>
         <input
           id="firstName"
           className="field-input"
           autoComplete="given-name"
           value={value.firstName ?? ""}
           onChange={(e) => onChange({ ...value, firstName: e.target.value })}
-          aria-invalid={!!errors.firstName}
-          aria-describedby={errors.firstName ? "firstName-error" : undefined}
+          aria-invalid={!!errors["firstName"]}
+          aria-describedby={errors["firstName"] ? "firstName-error" : undefined}
         />
       </Field>
-      <Field name="lastName" label="Nom" error={errors.lastName}>
+      <Field name="lastName" label="Nom" error={errors["lastName"]}>
         <input
           id="lastName"
           className="field-input"
           autoComplete="family-name"
           value={value.lastName ?? ""}
           onChange={(e) => onChange({ ...value, lastName: e.target.value })}
-          aria-invalid={!!errors.lastName}
+          aria-invalid={!!errors["lastName"]}
         />
       </Field>
-      <Field name="ageBand" label="Tranche d’âge" error={errors.ageBand}>
+      <Field name="ageBand" label="Tranche d’âge" error={errors["ageBand"]}>
         <select
           id="ageBand"
           className="field-input"
@@ -154,7 +154,7 @@ export function ProfileFields({
         <Field
           name="contact"
           label={value.contactType === "telephone" ? "Numéro de téléphone" : "Adresse e-mail"}
-          error={errors.contact}
+          error={errors["contact"]}
         >
           <input
             id="contact"
@@ -163,7 +163,7 @@ export function ProfileFields({
             autoComplete={value.contactType === "telephone" ? "tel" : "email"}
             value={value.contact ?? ""}
             onChange={(e) => onChange({ ...value, contact: e.target.value })}
-            aria-invalid={!!errors.contact}
+            aria-invalid={!!errors["contact"]}
           />
         </Field>
       </div>
@@ -181,7 +181,7 @@ export function ResidenceFields({
 }) {
   return (
     <div className="space-y-5">
-      <Field name="regionCode" label="Région" error={errors.regionCode}>
+      <Field name="regionCode" label="Région" error={errors["regionCode"]}>
         <select
           id="regionCode"
           className="field-input"
@@ -198,7 +198,7 @@ export function ResidenceFields({
           ))}
         </select>
       </Field>
-      <Field name="departmentCode" label="Département" error={errors.departmentCode}>
+      <Field name="departmentCode" label="Département" error={errors["departmentCode"]}>
         <select
           id="departmentCode"
           className="field-input disabled:opacity-50"
@@ -216,7 +216,7 @@ export function ResidenceFields({
           ))}
         </select>
       </Field>
-      <Field name="arrondissementCode" label="Arrondissement" error={errors.arrondissementCode}>
+      <Field name="arrondissementCode" label="Arrondissement" error={errors["arrondissementCode"]}>
         <select
           id="arrondissementCode"
           className="field-input disabled:opacity-50"
@@ -255,7 +255,7 @@ export function ActivityFields({
 }) {
   return (
     <div className="space-y-5">
-      <Field name="situation" label="Situation professionnelle" error={errors.situation}>
+      <Field name="situation" label="Situation professionnelle" error={errors["situation"]}>
         <select
           id="situation"
           className="field-input"
@@ -272,7 +272,7 @@ export function ActivityFields({
           ))}
         </select>
       </Field>
-      <Field name="sectorCode" label="Secteur d’activité" error={errors.sectorCode}>
+      <Field name="sectorCode" label="Secteur d’activité" error={errors["sectorCode"]}>
         <select
           id="sectorCode"
           className="field-input"
@@ -287,7 +287,7 @@ export function ActivityFields({
           ))}
         </select>
       </Field>
-      <Field name="profession" label="Profession" optional error={errors.profession}>
+      <Field name="profession" label="Profession" optional error={errors["profession"]}>
         <input
           id="profession"
           className="field-input"
@@ -358,13 +358,15 @@ export function CensusForm({ assisted = false }: { assisted?: boolean }) {
   const session = useSession(),
     app = useApp(),
     navigate = useNavigate();
-  const uid = session?.account.userId ?? "visitor-demo";
+  const uid = assisted ? "assisted-demo" : (session?.account.userId ?? "visitor-demo");
   const [draft, setDraft] = useState<CensusDraft>({
     step: 0,
     profile: { contactType: "email" },
     participation: { interested: false, interests: [] },
   });
-  const [ready, setReady] = useState(false);
+  const [loadedUid, setLoadedUid] = useState<string | null>(null);
+  const ready = loadedUid === uid;
+  const submitted = useRef(false);
   const [ack, setAck] = useState(false),
     [contactConsent, setContactConsent] = useState(false),
     [confirmed, setConfirmed] = useState(false),
@@ -372,16 +374,20 @@ export function CensusForm({ assisted = false }: { assisted?: boolean }) {
     [busy, setBusy] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
-    const d = loadDraft(uid);
-    if (d) {
-      setDraft(d);
-      setAck(!!d.notice);
-      setContactConsent(d.notice?.acceptsCentreContact ?? false);
-    }
-    setReady(true);
+    const d = loadDraft(uid) ?? {
+      step: 0,
+      profile: { contactType: "email" as const },
+      participation: { interested: false, interests: [] },
+    };
+    const currentNotice = d.notice?.version === NOTICE_VERSION;
+    setDraft(currentNotice ? d : { ...d, step: 0, notice: undefined });
+    setAck(currentNotice);
+    setContactConsent(currentNotice ? (d.notice?.acceptsCentreContact ?? false) : false);
+    setConfirmed(false);
+    setLoadedUid(uid);
   }, [uid]);
   useEffect(() => {
-    if (ready) saveDraft(uid, draft);
+    if (ready && !submitted.current) saveDraft(uid, draft);
   }, [draft, ready, uid]);
   const update = (v: Partial<CensusDraft>) => setDraft((d) => ({ ...d, ...v }));
   const step = draft.step;
@@ -393,7 +399,7 @@ export function CensusForm({ assisted = false }: { assisted?: boolean }) {
   }
   function valid() {
     let errs: Record<string, string> = {};
-    if (step === 0 && !ack) errs.notice = "Veuillez confirmer avoir lu la notice.";
+    if (step === 0 && !ack) errs["notice"] = "Veuillez confirmer avoir lu la notice.";
     const schema =
       step === 1
         ? profileSchema
@@ -408,7 +414,7 @@ export function CensusForm({ assisted = false }: { assisted?: boolean }) {
       if (!result.success)
         for (const issue of result.error.issues) errs[String(issue.path[0])] = issue.message;
     }
-    if (step === 5 && !confirmed) errs.confirm = "Confirmez l’exactitude des informations.";
+    if (step === 5 && !confirmed) errs["confirm"] = "Confirmez l’exactitude des informations.";
     setErrors(errs);
     return !Object.keys(errs).length;
   }
@@ -429,7 +435,13 @@ export function CensusForm({ assisted = false }: { assisted?: boolean }) {
     const p = profileSchema.safeParse(draft.profile),
       r = residenceSchema.safeParse(draft.residence),
       a = activitySchema.safeParse(draft.activity);
-    if (!p.success || !r.success || !a.success || !draft.notice) {
+    if (
+      !p.success ||
+      !r.success ||
+      !a.success ||
+      !draft.notice ||
+      draft.notice.version !== NOTICE_VERSION
+    ) {
       toast.error("Vérifiez les étapes précédentes.");
       return;
     }
@@ -452,8 +464,10 @@ export function CensusForm({ assisted = false }: { assisted?: boolean }) {
         activity: a.data as ActivityData,
         participation: draft.participation ?? { interested: false, interests: [] },
       });
+      submitted.current = true;
       clearDraft(uid);
-      navigate({ to: "/recensement/confirmation", search: { ref: dossier.reference } });
+      if (assisted) navigate({ to: "/admin/dossiers/$id", params: { id: dossier.id } });
+      else navigate({ to: "/recensement/confirmation", search: { ref: dossier.reference } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "La soumission a échoué.");
     } finally {
@@ -567,9 +581,9 @@ export function CensusForm({ assisted = false }: { assisted?: boolean }) {
                   />
                   J’ai lu la notice d’information et je souhaite poursuivre volontairement.
                 </label>
-                {errors.notice && (
+                {errors["notice"] && (
                   <p role="alert" className="text-sm text-danger">
-                    {errors.notice}
+                    {errors["notice"]}
                   </p>
                 )}
                 <label className="flex items-start gap-3 text-sm">
@@ -681,9 +695,9 @@ export function CensusForm({ assisted = false }: { assisted?: boolean }) {
                   />
                   Je confirme l’exactitude des informations de ce dossier de démonstration.
                 </label>
-                {errors.confirm && (
+                {errors["confirm"] && (
                   <p role="alert" className="text-sm text-danger">
-                    {errors.confirm}
+                    {errors["confirm"]}
                   </p>
                 )}
               </div>
