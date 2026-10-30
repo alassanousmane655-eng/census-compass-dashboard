@@ -77,32 +77,39 @@ export function Home() {
         <div className="absolute inset-0 hero-shade md:right-1/2" />
         <div className="container-page relative py-14 md:py-20">
           <div className="max-w-xl text-inverse">
-            <p className="mb-6 flex items-center gap-2 text-xs font-semibold">
-              <span className="h-px w-7 bg-inverse/60" />
-              CENTRE CULTUREL & COMMUNAUTAIRE
+            <p className="mb-7 flex items-center gap-3 text-[0.75rem] font-semibold uppercase tracking-[0.16em] text-copper-soft">
+              <span className="h-px w-10 bg-copper-soft/70" />
+              Centre culturel de la communauté haoussa
             </p>
-            <h1 className="text-display">HAOUSSA</h1>
-            <p className="mt-5 max-w-md text-2xl font-display font-semibold leading-snug md:text-3xl">
-              Notre héritage nous rassemble.
-              <br />
-              Notre avenir se construit ensemble.
+            <h1 className="font-display text-[2.6rem] font-extrabold leading-[1.02] tracking-[-0.03em] md:text-[4.25rem]">
+              <span className="block">Faire vivre</span>
+              <span className="block">notre culture.</span>
+              <span className="mt-1 block font-semibold text-sand">
+                Construire <span className="italic font-medium">notre</span> avenir.
+              </span>
+            </h1>
+            <p className="mt-6 max-w-md text-base leading-relaxed text-inverse/80 md:text-lg">
+              Un espace de <strong className="font-semibold text-inverse">transmission</strong>, de{" "}
+              <strong className="font-semibold text-inverse">participation</strong> et de
+              connaissance pour une communauté vivante au Cameroun.
             </p>
-            <p className="mt-5 max-w-md text-sm leading-relaxed text-inverse/85">
-              Un lieu de transmission, de rencontre et d’engagement pour la communauté haoussa au
-              Cameroun.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button variant="inverse" asChild>
+            <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
+              <Button variant="inverse" size="lg" asChild className="shadow-lift">
                 <Link to="/recensement/formulaire">
                   Se faire recenser <ArrowUpRight />
                 </Link>
               </Button>
-              <Button variant="outline-inverse" asChild>
-                <Link to="/le-centre">
-                  Découvrir le Centre <ArrowRight />
-                </Link>
-              </Button>
+              <Link
+                to="/le-centre"
+                className="group inline-flex items-center gap-2 border-b border-inverse/40 pb-1 text-sm font-semibold transition-colors hover:border-inverse"
+              >
+                Découvrir le Centre
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              </Link>
             </div>
+            <p className="mt-6 text-xs text-inverse/60">
+              Volontaire · 6 étapes · environ 8 minutes · résultats anonymes
+            </p>
           </div>
         </div>
         <span className="absolute bottom-4 right-5 text-[10px] text-inverse/80">
