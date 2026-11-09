@@ -52,6 +52,9 @@
   --color-paper: var(--paper);
   --color-ink: var(--ink);
   --color-inverse: var(--inverse);
+  --color-stage: var(--stage);
+  --color-stage-foreground: var(--stage-foreground);
+  --color-gold: var(--gold);
 
   --color-success: var(--success);
   --color-success-bg: var(--success-bg);
@@ -95,6 +98,10 @@
   --paper: oklch(1 0 0);
   --ink: oklch(0.25 0.01 150);
   --inverse: oklch(1 0 0);
+  /* Immersive observatory stage */
+  --stage: oklch(0.17 0.02 165);
+  --stage-foreground: oklch(0.97 0.01 90);
+  --gold: oklch(0.8 0.11 80);
 
   /* Semantic surfaces */
   --background: oklch(0.97 0.008 85);
