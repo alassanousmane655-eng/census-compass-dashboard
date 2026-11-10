@@ -271,3 +271,27 @@
   & tbody tr:hover { background: var(--primary-soft); }
 }
 @media (max-width: 640px) { .text-display { font-size: 2.25rem; } .section-title { font-size: 1.65rem; } }
+
+/* Immersive observatory */
+.stage-veil {
+  background:
+    radial-gradient(120% 90% at 30% 40%, transparent 0%, color-mix(in oklab, var(--stage) 55%, transparent) 60%, var(--stage) 100%),
+    linear-gradient(90deg, color-mix(in oklab, var(--stage) 70%, transparent), color-mix(in oklab, var(--stage) 35%, transparent) 60%, color-mix(in oklab, var(--stage) 75%, transparent));
+}
+.persona-card {
+  clip-path: polygon(10% 0, 90% 0, 100% 6%, 100% 92%, 50% 100%, 0 92%, 0 6%);
+  background: linear-gradient(160deg, var(--gold), var(--copper) 45%, var(--gold));
+  transform-style: preserve-3d;
+}
+.persona-card-inner {
+  clip-path: polygon(10% 0, 90% 0, 100% 6%, 100% 92%, 50% 100%, 0 92%, 0 6%);
+  background:
+    radial-gradient(120% 70% at 50% 0%, color-mix(in oklab, var(--gold) 22%, transparent), transparent 60%),
+    linear-gradient(180deg, color-mix(in oklab, var(--forest-900) 80%, var(--stage)), var(--stage));
+  padding-bottom: 3.5rem;
+}
+.persona-glare {
+  background: linear-gradient(105deg, transparent 35%, color-mix(in oklab, var(--stage-foreground) 14%, transparent) 50%, transparent 65%);
+  background-size: 250% 100%;
+  mix-blend-mode: screen;
+}

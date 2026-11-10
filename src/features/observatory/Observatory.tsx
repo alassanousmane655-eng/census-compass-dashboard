@@ -16,6 +16,7 @@ import {
 import { useApp } from "@/services/store";
 import { regionName } from "@/data/territory-utils";
 import type { Dossier } from "@/domain/types";
+import { ImmersiveObservatory } from "./immersive/ImmersiveObservatory";
 export function AggregateView({ dossiers }: { dossiers: Dossier[] }) {
   const [region, setRegion] = useState("");
   const rows = dossiers.filter(
@@ -187,6 +188,7 @@ export function Observatory() {
         title="Des parcours, des territoires, des perspectives."
         description="Indicateurs agrégés des dossiers déclarés. Aucun nom ni contact n’est publié."
       />
+      <ImmersiveObservatory dossiers={app.dossiers} />
       <AggregateView dossiers={app.dossiers} />
     </div>
   );
