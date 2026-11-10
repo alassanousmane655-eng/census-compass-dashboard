@@ -30,4 +30,4 @@ export const BUST_STYLE: Record<string, BustStyle> = {
   AUT: { garment: FOREST, trim: COPPER, garmentClass: "text-primary", headwear: "none", accessory: "star" },
 };
 
-export const styleFor = (sector: string) => BUST_STYLE[sector] ?? BUST_STYLE.AUT;
+export const styleFor = (sector: string) => BUST_STYLE[sector] ?? BUST_STYLE["AUT"];
