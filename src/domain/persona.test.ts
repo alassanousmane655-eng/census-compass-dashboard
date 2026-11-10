@@ -39,6 +39,14 @@ describe("buildPersona", () => {
     expect(p.stats.find((s) => s.key === "DEL")!.value).toBe(79); // median 10 days
   });
 
+  it("prefers a named sector over 'Autre secteur' even when 'Autre' is more frequent", () => {
+    const rows = [
+      ...Array.from({ length: 7 }, (_, i) => mk(i, { activity: { situation: "salarie", sectorCode: "AUT" } })),
+      ...Array.from({ length: 3 }, (_, i) => mk(50 + i, { activity: { situation: "salarie", sectorCode: "COM" } })),
+    ];
+    expect(buildPersona(rows, "EN", now)!.sectorCode).toBe("COM");
+  });
+
   it("ignores other regions and unsubmitted drafts", () => {
     const rows = [
       ...Array.from({ length: 10 }, (_, i) => mk(i, { residence: { regionCode: "NO", departmentCode: "", arrondissementCode: "" } })),
