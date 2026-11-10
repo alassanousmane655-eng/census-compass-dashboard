@@ -59,7 +59,7 @@ export function ImmersiveObservatory({ dossiers }: { dossiers: Dossier[] }) {
   const focus = hover ?? sel;
 
   return (
-    <section aria-labelledby="immersive-title" className="relative mb-14 overflow-hidden rounded-2xl bg-stage text-stage-foreground shadow-elegant">
+    <section aria-labelledby="immersive-title" className="relative mb-14 overflow-hidden rounded-2xl bg-stage text-stage-foreground shadow-lift">
       {/* Background photography */}
       <AnimatePresence>
         {media && (
