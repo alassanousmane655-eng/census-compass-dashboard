@@ -136,6 +136,7 @@ export function ImmersiveObservatory({ dossiers }: { dossiers: Dossier[] }) {
                         "cursor-pointer stroke-stage-foreground/70 outline-none transition-[fill] duration-300 [stroke-width:1.25]",
                         active ? "fill-gold/10 stroke-gold [stroke-width:2]" : level(s.code),
                         hover === s.code && !active && "fill-gold/60 stroke-gold",
+                        dim && "pointer-events-none",
                       )}
                     />
                   );
@@ -150,7 +151,7 @@ export function ImmersiveObservatory({ dossiers }: { dossiers: Dossier[] }) {
           </div>
 
           {sel && (
-            <div className="mt-6 flex flex-wrap items-center gap-2">
+            <div className="relative z-10 mt-6 flex flex-wrap items-center gap-2">
               <Button variant="outline" size="sm" onClick={() => setSel(null)} className="border-stage-foreground/30 bg-transparent text-stage-foreground hover:bg-stage-foreground/10 hover:text-stage-foreground">
                 <ArrowLeft /> Retour au Cameroun
               </Button>
@@ -164,7 +165,7 @@ export function ImmersiveObservatory({ dossiers }: { dossiers: Dossier[] }) {
           )}
         </div>
 
-        <div className="flex min-h-[560px] flex-col justify-center">
+        <div className="relative z-10 flex min-h-[560px] flex-col justify-center">
           <AnimatePresence mode="wait">
             {!sel ? (
               <motion.div key="list" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.4 }}>
