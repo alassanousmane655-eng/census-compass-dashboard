@@ -24,8 +24,17 @@ function fit(code: string | null) {
   return { x: MAP_WIDTH / 2 - (x + w / 2) * scale, y: MAP_HEIGHT / 2 - (y + h / 2) * scale, scale };
 }
 
-export function ImmersiveObservatory({ dossiers }: { dossiers: Dossier[] }) {
+export function ImmersiveObservatory({
+  dossiers,
+  onRegionChange,
+}: {
+  dossiers: Dossier[];
+  onRegionChange?: (code: string | null) => void;
+}) {
   const [sel, setSel] = useState<string | null>(null);
+  useEffect(() => {
+    onRegionChange?.(sel);
+  }, [sel, onRegionChange]);
   const [hover, setHover] = useState<string | null>(null);
 
   const counts = useMemo(() => countBy(dossiers.filter((d) => d.submittedAt), (d) => d.residence.regionCode), [dossiers]);

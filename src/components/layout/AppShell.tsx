@@ -33,6 +33,7 @@ const publicLinks = [
   { to: "/culture", label: "Culture & communauté" },
   { to: "/recensement", label: "Recensement" },
   { to: "/observatoire", label: "Observatoire" },
+  { to: "/heritage", label: "Héritage" },
 ] as const;
 const memberLinks = [
   { to: "/membre", label: "Vue d’ensemble", icon: LayoutDashboard },
