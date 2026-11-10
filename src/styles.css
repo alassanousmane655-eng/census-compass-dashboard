@@ -53,6 +53,13 @@
   --color-ink: var(--ink);
   --color-inverse: var(--inverse);
   --color-stage: var(--stage);
+  --color-heritage-night: #0d1516;
+  --color-heritage-forest: #172321;
+  --color-heritage-ivory: #f0e9da;
+  --color-heritage-brass: #b99a67;
+  --color-heritage-indigo: #405a75;
+  --color-heritage-terracotta: #a75e48;
+  --font-editorial: "Cormorant Garamond", Georgia, serif;
   --color-stage-foreground: var(--stage-foreground);
   --color-gold: var(--gold);
 
@@ -294,4 +301,15 @@
   background: linear-gradient(105deg, transparent 35%, color-mix(in oklab, var(--stage-foreground) 14%, transparent) 50%, transparent 65%);
   background-size: 250% 100%;
   mix-blend-mode: screen;
+}
+
+/* Midnight Heritage — scoped dark universe, never applied site-wide */
+.theme-heritage {
+  background: var(--color-heritage-night);
+  color: var(--color-heritage-ivory);
+}
+.heritage-slot {
+  background:
+    repeating-linear-gradient(45deg, color-mix(in oklab, var(--color-heritage-brass) 7%, transparent) 0 1px, transparent 1px 14px),
+    radial-gradient(80% 80% at 30% 30%, var(--color-heritage-forest), var(--color-heritage-night));
 }
