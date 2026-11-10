@@ -14,3 +14,6 @@
 - Feature views live under src/features and are mounted by individually titled TanStack leaf routes; the root owns the shared public/member/admin shell.
 - This phase is a frontend demonstration only: local browser persistence is not authentication or production security, and official texts must remain provisional.
 - All public statistical displays and exports must use suppression helpers before rendering; scope filters apply before aggregation in staff views.
+- Observatory regional personas are fictional and computed only from region aggregates in src/domain/persona.ts (null below the suppression threshold); never derive them from an individual dossier — privacy.
+- Real 3D (three/R3F) is lazy-loaded behind ClientOnly with a CSS depth fallback for phones, reduced motion and weak devices — keeps SSR and mobile light.
+- Region photos are real Commons images with credits in src/data/region-media.ts; retouching may grade/crop but never add content — the client forbids invented scenery.

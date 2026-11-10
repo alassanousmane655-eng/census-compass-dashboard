@@ -24,8 +24,11 @@ export interface Persona {
 
 const SECTOR_COUNT = 13;
 const clamp99 = (v: number) => Math.max(0, Math.min(99, Math.round(v)));
+/** Most frequent value; catch-all answers ("autre", "non communiqué") only win if nothing else exists. */
+const VAGUE = new Set(["AUT", "autre", "non_communique"]);
 const mode = (rec: Record<string, number>) =>
-  Object.entries(rec).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] ?? "";
+  Object.entries(rec)
+    .sort((a, b) => Number(VAGUE.has(a[0])) - Number(VAGUE.has(b[0])) || b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] ?? "";
 
 export function buildPersona(
   all: Dossier[],
