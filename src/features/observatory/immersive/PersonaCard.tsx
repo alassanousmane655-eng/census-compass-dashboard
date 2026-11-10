@@ -125,7 +125,7 @@ export function PersonaCard({ persona }: { persona: Persona }) {
           >
             <h3 className="font-display text-xl font-bold">{SECTOR_TITLE[persona.sectorCode] ?? "Profil type"}</h3>
             <p className="mt-1 text-xs text-stage-foreground/70">
-              {labelOf(SITUATIONS, persona.situation)} · {labelOf(AGE_BANDS, persona.ageBand)} ans
+              {labelOf(SITUATIONS, persona.situation)} · {labelOf(AGE_BANDS, persona.ageBand)}
             </p>
           </motion.div>
         </AnimatePresence>
