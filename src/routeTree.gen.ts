@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as HeritageRouteImport } from './routes/heritage'
 import { Route as LeCentreRouteImport } from './routes/le-centre'
 import { Route as ObservatoireRouteImport } from './routes/observatoire'
 import { Route as SInscrireRouteImport } from './routes/s-inscrire'
@@ -60,6 +61,11 @@ const ConnexionRoute = ConnexionRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HeritageRoute = HeritageRouteImport.update({
+  id: '/heritage',
+  path: '/heritage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeCentreRoute = LeCentreRouteImport.update({
@@ -237,6 +243,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/connexion': typeof ConnexionRoute
   '/contact': typeof ContactRoute
+  '/heritage': typeof HeritageRoute
   '/le-centre': typeof LeCentreRoute
   '/observatoire': typeof ObservatoireRoute
   '/s-inscrire': typeof SInscrireRoute
@@ -276,6 +283,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/connexion': typeof ConnexionRoute
   '/contact': typeof ContactRoute
+  '/heritage': typeof HeritageRoute
   '/le-centre': typeof LeCentreRoute
   '/observatoire': typeof ObservatoireRoute
   '/s-inscrire': typeof SInscrireRoute
@@ -316,6 +324,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/connexion': typeof ConnexionRoute
   '/contact': typeof ContactRoute
+  '/heritage': typeof HeritageRoute
   '/le-centre': typeof LeCentreRoute
   '/observatoire': typeof ObservatoireRoute
   '/s-inscrire': typeof SInscrireRoute
@@ -357,6 +366,7 @@ export interface FileRouteTypes {
     | '/'
     | '/connexion'
     | '/contact'
+    | '/heritage'
     | '/le-centre'
     | '/observatoire'
     | '/s-inscrire'
@@ -396,6 +406,7 @@ export interface FileRouteTypes {
     | '/'
     | '/connexion'
     | '/contact'
+    | '/heritage'
     | '/le-centre'
     | '/observatoire'
     | '/s-inscrire'
@@ -435,6 +446,7 @@ export interface FileRouteTypes {
     | '/'
     | '/connexion'
     | '/contact'
+    | '/heritage'
     | '/le-centre'
     | '/observatoire'
     | '/s-inscrire'
@@ -475,6 +487,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConnexionRoute: typeof ConnexionRoute
   ContactRoute: typeof ContactRoute
+  HeritageRoute: typeof HeritageRoute
   LeCentreRoute: typeof LeCentreRoute
   ObservatoireRoute: typeof ObservatoireRoute
   SInscrireRoute: typeof SInscrireRoute
@@ -532,6 +545,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/heritage': {
+      id: '/heritage'
+      path: '/heritage'
+      fullPath: '/heritage'
+      preLoaderRoute: typeof HeritageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/le-centre': {
@@ -779,6 +799,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConnexionRoute: ConnexionRoute,
   ContactRoute: ContactRoute,
+  HeritageRoute: HeritageRoute,
   LeCentreRoute: LeCentreRoute,
   ObservatoireRoute: ObservatoireRoute,
   SInscrireRoute: SInscrireRoute,
