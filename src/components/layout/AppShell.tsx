@@ -91,6 +91,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const admin = pathname.startsWith("/admin"),
     member = pathname.startsWith("/membre");
+  // Heritage is an autonomous space with its own shell and permanent exit.
+  if (pathname.startsWith("/heritage")) return <>{children}</>;
   if (admin || member)
     return (
       <div className="min-h-screen bg-background">

@@ -313,3 +313,24 @@
     repeating-linear-gradient(45deg, color-mix(in oklab, var(--color-heritage-brass) 7%, transparent) 0 1px, transparent 1px 14px),
     radial-gradient(80% 80% at 30% 30%, var(--color-heritage-forest), var(--color-heritage-night));
 }
+.heritage-night-sky {
+  background:
+    radial-gradient(1px 1px at 12% 18%, var(--color-heritage-ivory), transparent 60%),
+    radial-gradient(1px 1px at 72% 12%, var(--color-heritage-ivory), transparent 60%),
+    radial-gradient(1.5px 1.5px at 38% 62%, var(--color-heritage-brass), transparent 60%),
+    radial-gradient(1px 1px at 86% 48%, var(--color-heritage-ivory), transparent 60%),
+    radial-gradient(1px 1px at 22% 82%, var(--color-heritage-ivory), transparent 60%),
+    radial-gradient(1px 1px at 58% 30%, var(--color-heritage-ivory), transparent 60%),
+    radial-gradient(1.5px 1.5px at 92% 86%, var(--color-heritage-brass), transparent 60%),
+    radial-gradient(120% 70% at 50% 120%, color-mix(in oklab, var(--color-heritage-indigo) 55%, transparent), transparent 60%),
+    radial-gradient(90% 60% at 50% 0%, var(--color-heritage-forest), var(--color-heritage-night));
+}
+.heritage-frieze {
+  background:
+    repeating-linear-gradient(45deg, transparent 0 9px, var(--color-heritage-brass) 9px 10px, transparent 10px 20px),
+    repeating-linear-gradient(-45deg, transparent 0 9px, var(--color-heritage-brass) 9px 10px, transparent 10px 20px);
+  opacity: 0.55;
+}
+.heritage-grain {
+  background-image: repeating-radial-gradient(circle at 30% 30%, color-mix(in oklab, var(--color-heritage-ivory) 4%, transparent) 0 1px, transparent 1px 3px);
+}
