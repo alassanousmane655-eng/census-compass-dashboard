@@ -1,6 +1,15 @@
 # Accueil cinématique : vidéo pilotée par le défilement
 
-Votre notice (« 10K Websites ») décrit un principe précis. Une seule vidéo avance quand on descend et recule quand on remonte. Des légendes apparaissent par étapes dans les zones calmes de l'image. Puis la page se pose sur un vrai site avec un appel à l'action clair. Je l'applique à la page d'accueil avec votre vidéo (l'homme qui pose son bonnet et passe sous l'arche) et vos trois images.
+Votre notice (« 10K Websites ») décrit un principe précis. Une seule vidéo avance quand on descend et recule quand on remonte. Des légendes apparaissent par étapes dans les zones calmes de l'image. Puis la page se pose sur un vrai site avec un appel à l'action clair. Je l'applique à la page d'accueil avec votre vidéo (l'homme qui pose son bonnet et passe sous l'arche) et vos trois images.  
+CRITIQUE: Il est absolument important de noter que l'image du bonnet est l'image d'entrée. L'homme ne le pose pas, il le prend. Donc c'est important suivant le prompt de génération suivant: 
+
+Étape 1, image de départ (16:9, 2k, environ 2 crédits) :
+
+'
+
+16:9, 2k, photorealistic cinematic photograph. Low camera at table height in a sunlit whitewashed courtyard loggia, early morning golden light raking in from the left. In the right third of the frame, on a worn dark wooden table, rests one finished Hausa hula cap: cylindrical, flat-topped, ivory and deep indigo cotton, fine curvilinear geometric hand embroidery with a single thread of warm copper. Beside it a wooden spool of copper thread and a folded ivory cloth. From the right edge the wide hanging sleeve of a deep indigo babban riga enters, the hand almost entirely hidden inside the sleeve, relaxed, fingertips about to touch the cap. One continuous warm world: far behind the table, softly out of focus, a long sunlit courtyard axis leads to a deep arched entrance with pale relief-framed jambs glowing with light. The left side of the frame resolves into calm sunlit ivory plaster wall and gentle soft shadow. Shadows lean deep forest green. Shallow depth of field, drifting dust in the light, natural warm colour grade, no sepia. No text, no logos, no lettering anywhere.
+
+'
 
 ## Ce qui ne change pas (registre de non-régression)
 
@@ -47,4 +56,5 @@ Les étapes restantes d'Héritage (Journey, Musée, Atlas, validation) reprennen
 - Encodage : ffmpeg avec `-g 8 -an`, en 1280 px de large, puis lovable-assets. Image d'ouverture et image de fin en jpg ; les trois PNG convertis en jpg et passés par lovable-assets.
 - `src/features/public/home/ScrollFilm.tsx` (composant client) : fetch de la vidéo en Blob (règle Range), rAF lissé et indépendant de la fréquence d'écran, seeks protégés contre les blocages, IntersectionObserver, écritures DOM seulement en cas de changement, bandes de légendes définies en progression. Repli statique décidé en CSS et en JS (largeur < 768, prefers-reduced-motion, saveData).
 - `Home` dans PublicPages : remplacer la section du haut par ScrollFilm, en conservant exactement le bloc titre/boutons ; ajouter `HomeTriptych`.
-- Vérification Playwright : captures à 0 / 35 / 70 / 100 %, remontée, 390 px et mouvement réduit.
+- Vérification Playwright : captures à 0 / 35 / 70 / 100 %, remontée, 390 px et mouvement réduit.  
+- You are now in super elite agentic proactive mode. Don't stop until everything is set up. Proactively implement all steps until the final task of the final delivery of our $1 fucking million state of the art delivery. And make sure to update every file at the end and make every test and make sure this is responsive with a world class mobile experience, user experience.
