@@ -1,10 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { HeritageExperience } from "@/features/heritage/HeritageExperience";
-import { pageHead } from "@/lib/page-head";
-export const Route = createFileRoute("/heritage")({
-  head: () => pageHead("Héritage — Midnight Heritage", "Voyage immersif au cœur de la culture, du patrimoine et des traditions vivantes haoussa."),
-  component: Page,
-});
-function Page() {
-  return <HeritageExperience />;
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { HeritageI18nProvider } from "@/features/heritage/shared/i18n";
+import { HeritagePage } from "@/features/heritage/shared/HeritageShell";
+export const Route = createFileRoute("/heritage")({ component: Layout });
+function Layout() {
+  return <HeritageI18nProvider><HeritagePage><Outlet /></HeritagePage></HeritageI18nProvider>;
 }

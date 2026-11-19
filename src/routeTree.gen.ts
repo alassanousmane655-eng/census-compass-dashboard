@@ -34,6 +34,10 @@ import { Route as CultureActualitesRouteImport } from './routes/culture.actualit
 import { Route as CultureAgendaRouteImport } from './routes/culture.agenda'
 import { Route as CultureGalerieRouteImport } from './routes/culture.galerie'
 import { Route as CultureProgrammesRouteImport } from './routes/culture.programmes'
+import { Route as HeritageIndexRouteImport } from './routes/heritage.index'
+import { Route as HeritageAtlasRouteImport } from './routes/heritage.atlas'
+import { Route as HeritageJourneyRouteImport } from './routes/heritage.journey'
+import { Route as HeritageMuseeRouteImport } from './routes/heritage.musee'
 import { Route as MembreIndexRouteImport } from './routes/membre.index'
 import { Route as MembreAideRouteImport } from './routes/membre.aide'
 import { Route as MembreCorrectionsRouteImport } from './routes/membre.corrections'
@@ -173,6 +177,26 @@ const CultureProgrammesRoute = CultureProgrammesRouteImport.update({
   path: '/culture/programmes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HeritageIndexRoute = HeritageIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HeritageRoute,
+} as any)
+const HeritageAtlasRoute = HeritageAtlasRouteImport.update({
+  id: '/atlas',
+  path: '/atlas',
+  getParentRoute: () => HeritageRoute,
+} as any)
+const HeritageJourneyRoute = HeritageJourneyRouteImport.update({
+  id: '/journey',
+  path: '/journey',
+  getParentRoute: () => HeritageRoute,
+} as any)
+const HeritageMuseeRoute = HeritageMuseeRouteImport.update({
+  id: '/musee',
+  path: '/musee',
+  getParentRoute: () => HeritageRoute,
+} as any)
 const MembreIndexRoute = MembreIndexRouteImport.update({
   id: '/membre/',
   path: '/membre/',
@@ -243,7 +267,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/connexion': typeof ConnexionRoute
   '/contact': typeof ContactRoute
-  '/heritage': typeof HeritageRoute
+  '/heritage': typeof HeritageRouteWithChildren
   '/le-centre': typeof LeCentreRoute
   '/observatoire': typeof ObservatoireRoute
   '/s-inscrire': typeof SInscrireRoute
@@ -263,6 +287,9 @@ export interface FileRoutesByFullPath {
   '/culture/agenda': typeof CultureAgendaRoute
   '/culture/galerie': typeof CultureGalerieRoute
   '/culture/programmes': typeof CultureProgrammesRoute
+  '/heritage/atlas': typeof HeritageAtlasRoute
+  '/heritage/journey': typeof HeritageJourneyRoute
+  '/heritage/musee': typeof HeritageMuseeRoute
   '/membre/aide': typeof MembreAideRoute
   '/membre/corrections': typeof MembreCorrectionsRoute
   '/membre/demandes': typeof MembreDemandesRoute
@@ -275,6 +302,7 @@ export interface FileRoutesByFullPath {
   '/recensement/protection': typeof RecensementProtectionRoute
   '/admin/': typeof AdminIndexRoute
   '/culture/': typeof CultureIndexRoute
+  '/heritage/': typeof HeritageIndexRoute
   '/membre/': typeof MembreIndexRoute
   '/recensement/': typeof RecensementIndexRoute
   '/admin/dossiers/$id': typeof AdminDossiersIdRoute
@@ -283,7 +311,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/connexion': typeof ConnexionRoute
   '/contact': typeof ContactRoute
-  '/heritage': typeof HeritageRoute
   '/le-centre': typeof LeCentreRoute
   '/observatoire': typeof ObservatoireRoute
   '/s-inscrire': typeof SInscrireRoute
@@ -303,6 +330,9 @@ export interface FileRoutesByTo {
   '/culture/agenda': typeof CultureAgendaRoute
   '/culture/galerie': typeof CultureGalerieRoute
   '/culture/programmes': typeof CultureProgrammesRoute
+  '/heritage/atlas': typeof HeritageAtlasRoute
+  '/heritage/journey': typeof HeritageJourneyRoute
+  '/heritage/musee': typeof HeritageMuseeRoute
   '/membre/aide': typeof MembreAideRoute
   '/membre/corrections': typeof MembreCorrectionsRoute
   '/membre/demandes': typeof MembreDemandesRoute
@@ -315,6 +345,7 @@ export interface FileRoutesByTo {
   '/recensement/protection': typeof RecensementProtectionRoute
   '/admin': typeof AdminIndexRoute
   '/culture': typeof CultureIndexRoute
+  '/heritage': typeof HeritageIndexRoute
   '/membre': typeof MembreIndexRoute
   '/recensement': typeof RecensementIndexRoute
   '/admin/dossiers/$id': typeof AdminDossiersIdRoute
@@ -324,7 +355,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/connexion': typeof ConnexionRoute
   '/contact': typeof ContactRoute
-  '/heritage': typeof HeritageRoute
+  '/heritage': typeof HeritageRouteWithChildren
   '/le-centre': typeof LeCentreRoute
   '/observatoire': typeof ObservatoireRoute
   '/s-inscrire': typeof SInscrireRoute
@@ -344,6 +375,9 @@ export interface FileRoutesById {
   '/culture/agenda': typeof CultureAgendaRoute
   '/culture/galerie': typeof CultureGalerieRoute
   '/culture/programmes': typeof CultureProgrammesRoute
+  '/heritage/atlas': typeof HeritageAtlasRoute
+  '/heritage/journey': typeof HeritageJourneyRoute
+  '/heritage/musee': typeof HeritageMuseeRoute
   '/membre/aide': typeof MembreAideRoute
   '/membre/corrections': typeof MembreCorrectionsRoute
   '/membre/demandes': typeof MembreDemandesRoute
@@ -356,6 +390,7 @@ export interface FileRoutesById {
   '/recensement/protection': typeof RecensementProtectionRoute
   '/admin/': typeof AdminIndexRoute
   '/culture/': typeof CultureIndexRoute
+  '/heritage/': typeof HeritageIndexRoute
   '/membre/': typeof MembreIndexRoute
   '/recensement/': typeof RecensementIndexRoute
   '/admin/dossiers_/$id': typeof AdminDossiersIdRoute
@@ -386,6 +421,9 @@ export interface FileRouteTypes {
     | '/culture/agenda'
     | '/culture/galerie'
     | '/culture/programmes'
+    | '/heritage/atlas'
+    | '/heritage/journey'
+    | '/heritage/musee'
     | '/membre/aide'
     | '/membre/corrections'
     | '/membre/demandes'
@@ -398,6 +436,7 @@ export interface FileRouteTypes {
     | '/recensement/protection'
     | '/admin/'
     | '/culture/'
+    | '/heritage/'
     | '/membre/'
     | '/recensement/'
     | '/admin/dossiers/$id'
@@ -406,7 +445,6 @@ export interface FileRouteTypes {
     | '/'
     | '/connexion'
     | '/contact'
-    | '/heritage'
     | '/le-centre'
     | '/observatoire'
     | '/s-inscrire'
@@ -426,6 +464,9 @@ export interface FileRouteTypes {
     | '/culture/agenda'
     | '/culture/galerie'
     | '/culture/programmes'
+    | '/heritage/atlas'
+    | '/heritage/journey'
+    | '/heritage/musee'
     | '/membre/aide'
     | '/membre/corrections'
     | '/membre/demandes'
@@ -438,6 +479,7 @@ export interface FileRouteTypes {
     | '/recensement/protection'
     | '/admin'
     | '/culture'
+    | '/heritage'
     | '/membre'
     | '/recensement'
     | '/admin/dossiers/$id'
@@ -466,6 +508,9 @@ export interface FileRouteTypes {
     | '/culture/agenda'
     | '/culture/galerie'
     | '/culture/programmes'
+    | '/heritage/atlas'
+    | '/heritage/journey'
+    | '/heritage/musee'
     | '/membre/aide'
     | '/membre/corrections'
     | '/membre/demandes'
@@ -478,6 +523,7 @@ export interface FileRouteTypes {
     | '/recensement/protection'
     | '/admin/'
     | '/culture/'
+    | '/heritage/'
     | '/membre/'
     | '/recensement/'
     | '/admin/dossiers_/$id'
@@ -487,7 +533,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConnexionRoute: typeof ConnexionRoute
   ContactRoute: typeof ContactRoute
-  HeritageRoute: typeof HeritageRoute
+  HeritageRoute: typeof HeritageRouteWithChildren
   LeCentreRoute: typeof LeCentreRoute
   ObservatoireRoute: typeof ObservatoireRoute
   SInscrireRoute: typeof SInscrireRoute
@@ -701,6 +747,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CultureProgrammesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/heritage/': {
+      id: '/heritage/'
+      path: '/'
+      fullPath: '/heritage/'
+      preLoaderRoute: typeof HeritageIndexRouteImport
+      parentRoute: typeof HeritageRoute
+    }
+    '/heritage/atlas': {
+      id: '/heritage/atlas'
+      path: '/atlas'
+      fullPath: '/heritage/atlas'
+      preLoaderRoute: typeof HeritageAtlasRouteImport
+      parentRoute: typeof HeritageRoute
+    }
+    '/heritage/journey': {
+      id: '/heritage/journey'
+      path: '/journey'
+      fullPath: '/heritage/journey'
+      preLoaderRoute: typeof HeritageJourneyRouteImport
+      parentRoute: typeof HeritageRoute
+    }
+    '/heritage/musee': {
+      id: '/heritage/musee'
+      path: '/musee'
+      fullPath: '/heritage/musee'
+      preLoaderRoute: typeof HeritageMuseeRouteImport
+      parentRoute: typeof HeritageRoute
+    }
     '/membre/': {
       id: '/membre/'
       path: '/membre'
@@ -795,11 +869,29 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface HeritageRouteChildren {
+  HeritageAtlasRoute: typeof HeritageAtlasRoute
+  HeritageJourneyRoute: typeof HeritageJourneyRoute
+  HeritageMuseeRoute: typeof HeritageMuseeRoute
+  HeritageIndexRoute: typeof HeritageIndexRoute
+}
+
+const HeritageRouteChildren: HeritageRouteChildren = {
+  HeritageAtlasRoute: HeritageAtlasRoute,
+  HeritageJourneyRoute: HeritageJourneyRoute,
+  HeritageMuseeRoute: HeritageMuseeRoute,
+  HeritageIndexRoute: HeritageIndexRoute,
+}
+
+const HeritageRouteWithChildren = HeritageRoute._addFileChildren(
+  HeritageRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConnexionRoute: ConnexionRoute,
   ContactRoute: ContactRoute,
-  HeritageRoute: HeritageRoute,
+  HeritageRoute: HeritageRouteWithChildren,
   LeCentreRoute: LeCentreRoute,
   ObservatoireRoute: ObservatoireRoute,
   SInscrireRoute: SInscrireRoute,
